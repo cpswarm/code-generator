@@ -11,12 +11,10 @@ public class App {
 	private final static String OUTPUT_DIR = "generated/";
 
 	public static void main(String[] args) {
-//		String outputFile = "generated/sar_behavior.py";
-//		String inputFile = "input/scxml/sar_FSM.xml";
 
-		 String inputFile  = "input/scxml/UAV_sar_FSM.xml";
-		 String outputFile = "generated/uav_behavior.py";
-		
+		String inputFile = "input/scxml/UAV_sar_FSM.xml";
+		String outputFile = "generated/uav_behavior.py";
+
 		int i = 0;
 		String arg;
 
@@ -45,9 +43,9 @@ public class App {
 		}
 		System.out.println("Code generated with success!!");
 	}
-	
-//	private void init() {
-//
-//	}
- 
+
+	// private void init() {
+	//
+	// }
+
 }
