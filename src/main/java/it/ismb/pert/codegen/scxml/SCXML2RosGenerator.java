@@ -15,15 +15,20 @@ import org.apache.commons.scxml2.model.ModelException;
 import org.apache.commons.scxml2.model.SCXML;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
 public class SCXML2RosGenerator {
 
 	private Template template;
 
 	public SCXML2RosGenerator(String templateFile) {
-		template = Velocity.getTemplate(templateFile);
-		Velocity.setProperty("space.gobbling", "structured");
+		VelocityEngine ve = new VelocityEngine();
+		ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
+	    ve.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+		template = ve.getTemplate(templateFile);
+		ve.setProperty("space.gobbling", "structured");
 	}
 
 	public void generate(String inputPath, String dest) throws IOException {
