@@ -1,0 +1,22 @@
+#*************************************************************************************************
+*	generate Action State
+*###
+	${indent}smach_ros.SimpleActionState('$action_content.item(0).getFirstChild().getNodeValue()',
+	#if($action_content.item(2).getAttributes().item(0).getNodeValue() == "object")
+		${indent}$action_content.item(1).getFirstChild().getNodeValue()Action,
+		#set($last = $action_content.item(2).getChildNodes().getLength() - 1)
+		#set($goal = ${action_content.item(1).getFirstChild().getNodeValue()} + 'Goal(')
+		${indent}goal=$goal#foreach($i in [0..$last])
+			#if($i == $last)$action_content.item(2).getChildNodes().item($i).getFirstChild().getNodeValue()))#if($continue),#end
+			#else$action_content.item(2).getChildNodes().item($i).getFirstChild().getNodeValue(), #end
+		#end
+	#elseif($action_content.item(2).getAttributes().item(0).getNodeValue() == "slot")
+		${indent}$action_content.item(1).getFirstChild().getNodeValue()Action,
+		#set($last = $action_content.item(2).getChildNodes().getLength() - 1)
+		${indent}goal_slots=[#foreach($i in [0..$last])
+			#if($i == $last)'$action_content.item(2).getChildNodes().item($i).getFirstChild().getNodeValue()'])#if($continue),#end
+			#else'$action_content.item(2).getChildNodes().item($i).getFirstChild().getNodeValue()', #end
+		#end
+	#elseif($action_content.item(2).getAttributes().item(0).getNodeValue() == "empty")
+		${indent}$action_content.item(1).getFirstChild().getNodeValue()Action)#if($continue),#end
+	#end

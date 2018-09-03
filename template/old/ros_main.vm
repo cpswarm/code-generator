@@ -1,0 +1,60 @@
+volatile bool leftBumper, rightBumper;
+
+ros::Subscriber leftBumperSub;
+ros::Subscriber rightBumperSub;
+
+EventQueue* mainEventQueue;
+struct MainEventQueue{
+	MainEventQueue(){ mainEventQueue = new RosEventQueue();	}
+	~MainEventQueue(){ delete mainEventQueue; }
+};
+
+/**************************************************
+*
+*   Callbacks
+*
+**************************************************/
+
+void onLeftBumperMessage(const std_msgs::Bool::Ptr& bumperState) {
+    ROS_INFO("Left bumper state = %s", bumperState->data ? "Active" : "Not active");
+    leftBumper = bumperState->data;
+}
+
+void onRightBumperMessage(const std_msgs::Bool::Ptr& bumperState) {
+    ROS_INFO("Right bumper state = %s", bumperState->data ? "Active" : "Not active");
+    rightBumper = bumperState->data;
+}
+
+/**************************************************
+*
+*   Main
+*
+**************************************************/
+
+int main(int argc, char** argv){
+
+	ros::init(argc, argv, "fsm_scxml");
+	MainEventQueue meq;
+	ros_decision_making_init(argc, argv);
+
+	ros::NodeHandle node;
+	leftBumperSub = node.subscribe("/turtlebot/left_bumper", 1, onLeftBumperMessage);
+	rightBumperSub = node.subscribe("/turtlebot/left_bumper", 1, onRightBumperMessage);
+
+	ros::AsyncSpinner spinner(2);
+	spinner.start();
+
+	ROS_INFO("Starting $scxml.name...");
+
+	/**
+	 * Blocking call
+	 */
+	mainEventQueue->async_spin();
+	Fsm${display.capitalize($scxml.name)}(NULL, mainEventQueue);
+	mainEventQueue->close();
+	
+	spinner.stop();
+	ROS_INFO("$scxml.name done");
+
+	return 0;
+}

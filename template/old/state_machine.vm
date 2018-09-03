@@ -1,0 +1,133 @@
+/**************************************************
+*
+*   FSM
+*
+**************************************************/
+
+FSM($scxml.name)
+{
+	FSM_STATES
+	{
+	#foreach($state in $scxml.children)
+		$state.id#if($foreach.hasNext),
+		#end
+	#end
+		
+	}
+	
+	FSM_START($scxml.initial);
+	FSM_BGN
+	{
+		#foreach($state in $scxml.children)
+			#if($state.atomicState)
+				#atomicState($state)
+			#elseif($state.class.simpleName == "State")
+				#compositState($state)## Non atomic State which contain inner state machine
+			#elseif($state.class.simpleName == "Parallel")
+			## Non atomic State which contain parallel states machines
+			#end
+			#if($foreach.hasNext)
+				
+			#end
+		#end
+	}
+	FSM_END
+}
+#********************************************************************
+*	Generate code for atomic state
+*#
+#macro(atomicState $state)
+		FSM_STATE($state.id)
+		{
+		#foreach($invoke in $state.invokes)
+			FSM_CALL_TASK($invoke.id)
+		#end
+		#if(!$state.transitionsList.empty)
+			FSM_TRANSITIONS
+			{
+				#foreach($transition in $state.transitionsList)
+				FSM_ON_EVENT($transition.event, FSM_NEXT($transition.next));
+				#end
+			}
+		#end
+		}
+#end
+#********************************************************************
+*	Generate code for atomic state with parallel Task to be executed
+*#
+#macro(atomicStateWithTasks $state)
+		FSM_STATE($state.id)
+		{
+		#foreach($invoke in $state.children.get(0).invokes)
+			FSM_CALL_TASK($invoke.id)
+		#end
+		#if(!$state.transitionsList.empty)
+			FSM_TRANSITIONS
+			{
+				#foreach($transition in $state.transitionsList)
+				FSM_ON_EVENT($transition.event, FSM_NEXT($transition.next));
+				#end
+			}
+		#end
+		}
+#end
+#********************************************************************
+*	Generate code for a composite State
+*#
+#macro(compositState $state)
+		#if($state.children.get(0).class.simpleName == "Parallel" && $state.children.get(0).children.empty)
+			#atomicStateWithTasks($state)## Parallel task to be executed
+		#elseif($state.children.get(0).class.simpleName == "State")## State machine inside the State
+		FSM_STATE($state.id)
+		{
+			FSM_CALL_FSM($state.first)
+			#if(!$state.transitionsList.empty)
+			FSM_TRANSITIONS
+			{
+				#foreach($transition in $state.transitionsList)
+				FSM_ON_EVENT($transition.event, FSM_NEXT($transition.next));
+				#end
+			}
+			#end
+		} $list.addLast($state.children.get(0))
+		#end
+#end
+#********************************************************************
+*	Generate code for inner FSM
+*#
+#foreach($fsm in $list)
+FSM($fsm.id)
+{
+	FSM_STATES
+	{
+	#foreach($state in $fsm.children)
+		$state.id#if($foreach.hasNext),
+		#end
+	#end
+		
+	}
+	
+	FSM_START($fsm.first);
+	FSM_BGN
+	{
+		#foreach($state in $fsm.children)
+			#if($state.atomicState)
+				#atomicState($state)
+			#elseif($state.class.simpleName == "State")
+				#compositState($state)## Non atomic State which contain inner state machine
+			#elseif($state.class.simpleName == "Parallel")
+			## Non atomic State which contain parallel states machines
+			#end
+			#if($foreach.hasNext)
+				
+			#end
+		#end
+	}
+	FSM_END
+}
+#if($foreach.hasNext)
+
+//**********************************************************
+			
+#end
+#end
