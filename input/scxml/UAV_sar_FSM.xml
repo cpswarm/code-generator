@@ -17,10 +17,21 @@
 				<invoke type="ROS_SERVICE" />
 				<transition event="succeeded" target="Idle" />
 			</state>
-
-			<state id="Idle">
+			
+			<parallel id="IdleThreads">
+				<state id="Idle">
+				</state>
+				
+				<state id="IdleEventMonitoring">
+					<datamodel>
+						<data id="invoke"><rosmonitor><topic>TO BE DEFINED</topic><msg>Bool</msg></rosmonitor>
+						</data>
+					</datamodel>
+					<invoke type="ROS_MONITOR" />
+				</state>
+				
 				<transition event="missionStart" target="TakeOff" />
-			</state>
+			</parallel>
 
 			<state id="TakeOff">
 				<datamodel>
@@ -59,17 +70,17 @@
 					<invoke type="ROS_MONITOR" />
 				</state>
 				
-				<transition event="targetFound" target="SelectRover" />				
+				<transition event="targetFound" target="Idle" />				
 			</parallel>
 			
 			<!-- ******************** SELECT ROVER ******************** -->			
-			<state id="SelectRover">
-				<datamodel>
-					<data id="invoke"><rosaction><name>cmd/assignTask</name><action>Empty</action><goal type="empty"></goal></rosaction>
-					</data>
-				</datamodel>
-				<invoke type="ROS_ACTION" />
-			</state>
+<!-- 			<state id="SelectRover"> -->
+<!-- 				<datamodel> -->
+<!-- 					<data id="invoke"><rosaction><name>cmd/assignTask</name><action>Empty</action><goal type="empty"></goal></rosaction> -->
+<!-- 					</data> -->
+<!-- 				</datamodel> -->
+<!-- 				<invoke type="ROS_ACTION" /> -->
+<!-- 			</state> -->
 			
 			<!-- ******************** TRACKING ******************** -->
 <!-- 			<parallel id="TrackingThreads"> -->
@@ -121,7 +132,7 @@
 		</state>
 		
 		<transition event="missionAbort" target="MissionAbort" />
-		<transition event="emergencyEvent" target="EmergencyRoutine" />
+<!-- 		<transition event="emergencyEvent" target="EmergencyRoutine" /> -->
 
 	</parallel>
 
@@ -131,8 +142,8 @@
 	</state>
 
 	<!-- ******************** EMERGENCY ROUTINE ******************** -->
-	<state id="EmergencyRoutine">
+<!-- 	<state id="EmergencyRoutine"> -->
 
-	</state>
+<!-- 	</state> -->
 
 </scxml>

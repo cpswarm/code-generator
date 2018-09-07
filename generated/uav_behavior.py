@@ -18,7 +18,7 @@ def main():
 		#  ===================================== SarThreads =====================================
 		# Create a Concurrence container
 		sarthreads_concurrence = smach.Concurrence(
-			outcomes=['missionAbort', 'emergencyEvent', 'aborted'],
+			outcomes=['missionAbort', 'aborted'],
 			default_outcome='missionAbort',
 			child_termination_cb=lambda so: True)
 	
@@ -39,9 +39,31 @@ def main():
 						StartUp),
 					transitions={'succeeded':'Idle'})
 
-				# ADD Idle to SarBehavior #
-				smach.StateMachine.add('Idle',
-					# NOT_SUPPORTED
+				#  ===================================== IdleThreads =====================================
+				# Create a Concurrence container
+				idlethreads_concurrence = smach.Concurrence(
+					outcomes=['missionStart', 'aborted'],
+					default_outcome='missionStart',
+					child_termination_cb=lambda so: True)
+	
+				# Open the container
+				with idlethreads_concurrence:
+
+					# ADD Idle to IdleThreads #
+					smach.Concurrence.add('Idle',
+						# NOT_SUPPORTED
+					)
+
+					# ADD IdleEventMonitoring to IdleThreads #
+					smach.Concurrence.add('IdleEventMonitoring',
+						smach_ros.MonitorState('TO BE DEFINED',
+							Bool,
+							cond_cb=lambda so: False))
+				#  ===================================== IdleThreads END =====================================
+
+				# ADD IdleThreads to SarBehavior #
+				smach.StateMachine.add('IdleThreads',
+					idlethreads_concurrence,
 					transitions={'missionStart':'TakeOff'})
 
 				# ADD TakeOff to SarBehavior #
@@ -68,7 +90,7 @@ def main():
 
 					# ADD CoverageEventMonitoring to CoverageThreads #
 					smach.Concurrence.add('CoverageEventMonitoring',
-						smach_ros.MonitorState('TO BE DEFINED', 
+						smach_ros.MonitorState('TO BE DEFINED',
 							Bool,
 							cond_cb=lambda so: False))
 				#  ===================================== CoverageThreads END =====================================
@@ -76,13 +98,7 @@ def main():
 				# ADD CoverageThreads to SarBehavior #
 				smach.StateMachine.add('CoverageThreads',
 					coveragethreads_concurrence,
-					transitions={'targetFound':'SelectRover'})
-
-				# ADD SelectRover to SarBehavior #
-				smach.StateMachine.add('SelectRover',
-					smach_ros.SimpleActionState('cmd/assignTask',
-						EmptyAction),
-					transitions={})
+					transitions={'targetFound':'Idle'})
 			#  ===================================== SarBehavior END =====================================
 
 			# ADD SarBehavior to SarThreads #
@@ -90,7 +106,7 @@ def main():
 
 			# ADD SarEventMonitoring to SarThreads #
 			smach.Concurrence.add('SarEventMonitoring',
-				smach_ros.MonitorState('TO BE DEFINED', 
+				smach_ros.MonitorState('TO BE DEFINED',
 					Bool,
 					cond_cb=lambda so: False))
 		#  ===================================== SarThreads END =====================================
@@ -98,15 +114,10 @@ def main():
 		# ADD SarThreads to TOP state #
 		smach.StateMachine.add('SarThreads',
 			sarthreads_concurrence,
-			transitions={'missionAbort':'MissionAbort', 'emergencyEvent':'EmergencyRoutine'})
+			transitions={'missionAbort':'MissionAbort'})
 
 		# ADD MissionAbort to TOP state #
 		smach.StateMachine.add('MissionAbort',
-			# NOT_SUPPORTED
-			transitions={})
-
-		# ADD EmergencyRoutine to TOP state #
-		smach.StateMachine.add('EmergencyRoutine',
 			# NOT_SUPPORTED
 			transitions={})
 

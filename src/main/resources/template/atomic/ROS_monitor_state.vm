@@ -3,4 +3,4 @@
 *###
 	${indent}smach_ros.MonitorState('$monitor_content.item(0).getFirstChild().getNodeValue()', 
 		${indent}$monitor_content.item(1).getFirstChild().getNodeValue(),
-		${indent}cond_cb=lambda so: False)
+		${indent}cond_cb=lambda ud, msg: False)
