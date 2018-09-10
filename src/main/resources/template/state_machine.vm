@@ -49,16 +49,23 @@ if __name__ == '__main__':
 #macro(parallelState $state $indent)
 
 ${indent}#  ===================================== ${state.id} =====================================
+${indent}def out_cb(outcome_map):
+	${indent}#To be completed
+
+	${indent}return 'aborted'
+
 ${indent}# Create a Concurrence container
 ${indent}${state.id.toLowerCase()}_concurrence = smach.Concurrence(
 #if(!$state.transitionsList.empty)
 	${indent}outcomes=[#foreach($transition in $state.transitionsList)'$transition.event'#if($foreach.hasNext), #else, 'aborted'#end#end],
 	${indent}default_outcome='$state.transitionsList.get(0).event',
-	${indent}child_termination_cb=lambda so: True)
+	${indent}child_termination_cb=lambda so: True,
+	${indent}outcome_cb=out_cb)
 #else
 	${indent}outcomes=['succeeded', 'preempted', 'aborted'],
 	${indent}default_outcome='aborted',
-	${indent}child_termination_cb=lambda so: True)
+	${indent}child_termination_cb=lambda so: True,
+	${indent}outcome_cb=out_cb)
 #end
 	
 ${indent}# Open the container
