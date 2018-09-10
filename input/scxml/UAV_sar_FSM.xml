@@ -35,7 +35,7 @@
 
 			<state id="TakeOff">
 				<datamodel>
-					<data id="invoke"><rosservice><name>cmd/takeoff</name><srv>TakeOff</srv><request empty="false"><param>10</param></request></rosservice>
+					<data id="invoke"><rosservice><name>cmd/takeoff</name><srv>TakeOff</srv><request empty="false"><param>1.5</param></request></rosservice>
 					</data>
 				</datamodel>
 				<invoke type="ROS_SERVICE" />
@@ -122,28 +122,55 @@
 			
 		</state>
 
-		<!-- ******************** SAR EVENT MONITORING ******************** -->
-		<state id="SarEventMonitoring">
+		<!-- ******************** ABORT EVENT MONITORING ******************** -->
+		<state id="AbortEventMonitoring">
 			<datamodel>
-				<data id="invoke"><rosmonitor><topic>TO BE DEFINED</topic><msg>Bool</msg></rosmonitor>
+				<data id="invoke"><rosmonitor><topic>TO BE DEFINED</topic><msg>Empty</msg></rosmonitor>
+				</data>
+			</datamodel>
+			<invoke type="ROS_MONITOR" />
+		</state>
+		
+		<!-- ******************** SAR EVENT MONITORING ******************** -->
+		<state id="EmergencyEventMonitoring">
+			<datamodel>
+				<data id="invoke"><rosmonitor><topic>TO BE DEFINED</topic><msg>Empty</msg></rosmonitor>
 				</data>
 			</datamodel>
 			<invoke type="ROS_MONITOR" />
 		</state>
 		
 		<transition event="missionAbort" target="MissionAbort" />
-<!-- 		<transition event="emergencyEvent" target="EmergencyRoutine" /> -->
+		<transition event="emergencyEvent" target="EmergencyRoutine" />
 
 	</parallel>
 
 	<!-- ******************** MISSION ABORT ******************** -->
 	<state id="MissionAbort">
-
+	
+		<state id="Land">
+			<datamodel>
+				<data id="invoke"><rosservice><name>cmd/land</name><srv>Empty</srv><request empty="true"/></rosservice>
+				</data>
+			</datamodel>
+			<invoke type="ROS_SERVICE" />
+			<transition event="succeeded" target="SarThreads" />
+		</state>
+		
 	</state>
 
 	<!-- ******************** EMERGENCY ROUTINE ******************** -->
-<!-- 	<state id="EmergencyRoutine"> -->
-
-<!-- 	</state> -->
+	<state id="EmergencyRoutine">
+	
+		<state id="Land">
+			<datamodel>
+				<data id="invoke"><rosservice><name>cmd/land</name><srv>Empty</srv><request empty="true"/></rosservice>
+				</data>
+			</datamodel>
+			<invoke type="ROS_SERVICE" />
+			<transition event="succeeded" target="SarThreads" />
+		</state>
+		
+	</state>
 
 </scxml>
