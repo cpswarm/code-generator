@@ -49,6 +49,7 @@ if __name__ == '__main__':
 #macro(parallelState $state $indent)
 
 ${indent}#  ===================================== ${state.id} =====================================
+${indent}#Callback for custom outcomes from ${state.id}
 ${indent}def out_cb(outcome_map):
 	${indent}#To be completed
 
