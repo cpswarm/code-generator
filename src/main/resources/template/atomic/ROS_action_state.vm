@@ -19,4 +19,7 @@
 		#end
 	#elseif($action_content.item(2).getAttributes().item(0).getNodeValue() == "empty")
 		${indent}$action_content.item(1).getFirstChild().getNodeValue()Action)#if($continue),#end
+	#elseif($action_content.item(2).getAttributes().item(0).getNodeValue() == "callback")
+		${indent}$action_content.item(1).getFirstChild().getNodeValue()Action,
+		${indent}goal_cb=$action_content.item(1).getFirstChild().getNodeValue().toLowerCase()_cb)#if($continue),#end
 	#end
