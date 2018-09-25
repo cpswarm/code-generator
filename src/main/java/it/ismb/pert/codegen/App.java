@@ -21,7 +21,7 @@ public class App {
 		// String inputFile = "input/scxml/logistic_FSM.xml";
 		// String outputFile = "generated/logistic_behavior.py";
 		
-		String inputFile, outputFile;
+		String inputFile = null, outputFile = null;
 
 		int i = 0;
 		String arg;
@@ -49,11 +49,11 @@ public class App {
 		// URL url = App.class.getClassLoader().getResource(stateMachineFile);
 		try {
 			generator.generate(inputFile, outputFile);
+			System.out.println("Code generated with success!!");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("Code generated with success!!");
 	}
 
 }
