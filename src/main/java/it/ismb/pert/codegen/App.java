@@ -7,40 +7,43 @@ import it.ismb.pert.codegen.scxml.SCXML2RosGenerator;
 public class App {
 
 	private final static String TEMPLATE_FILE = "template/state_machine.vm";
-//	private final static String INPUT_DIR = "input/scxml/";
-//	private final static String OUTPUT_DIR = "generated/";
+
+	// Debug variables
+	private final static boolean DEBUG = true;
+	private final static String DEBUG_INPUT_DIR = "input/scxml/";
+	private final static String DEBUG_OUTPUT_DIR = "generated/";
 
 	public static void main(String[] args) {
-
-//		String inputFile = "/home/gprato/eclipse-workspace/cpswarm/code-generator/input/scxml/UAV_sar_FSM3.xml";
-//		String outputFile = "/home/gprato/eclipse-workspace/cpswarm/code-generator/generated/uav_behavior_test.py";
 
 		// String inputFile = "input/scxml/UGV_sar_FSM.xml";
 		// String outputFile = "generated/ugv_behavior.py";
 
 		// String inputFile = "input/scxml/logistic_FSM.xml";
 		// String outputFile = "generated/logistic_behavior.py";
-		
+
 		String inputFile = null, outputFile = null;
 
-		int i = 0;
-		String arg;
+		if (DEBUG) {
+			inputFile = DEBUG_INPUT_DIR + "";
+			outputFile = DEBUG_OUTPUT_DIR + "";
+		} else {
+			int i = 0;
+			String arg;
 
-		while (i < args.length && args[i].startsWith("-")) {
-			arg = args[i++];
-			if (arg.equals("-src")) {
-				if (i < args.length) {
-					// inputFile = INPUT_DIR + args[i++];
-					inputFile = args[i++];
-				} else {
-					System.err.println("-src requires a file path");
-				}
-			} else if (arg.equals("-o")) {
-				if (i < args.length) {
-					// outputFile = OUTPUT_DIR + args[i++];
-					outputFile = args[i++];
-				} else {
-					System.err.println("-o requires a file path");
+			while (i < args.length && args[i].startsWith("--")) {
+				arg = args[i++];
+				if (arg.equals("--src")) {
+					if (i < args.length) {
+						inputFile = args[i++];
+					} else {
+						System.err.println("-src requires a file path");
+					}
+				} else if (arg.equals("--target")) {
+					if (i < args.length) {
+						outputFile = args[i++] + "/behavior.py";
+					} else {
+						System.err.println("--target requires a directory path");
+					}
 				}
 			}
 		}
