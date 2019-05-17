@@ -24,7 +24,7 @@ import it.links.pert.codegen.generator.CodeGenerator;
 
 public class SCXML2RosGenerator implements CodeGenerator {
 
-	private final static String TEMPLATE_FILE_NAME = "template/state_machine.vm";
+	private final static String TEMPLATE_FILE_NAME = "template/ros/state_machine.vm";
 	private final static String SMACH_FILE_NAME = "behaviour.py";
 	private final static String ROS_PKG_DEAFULT_NAME = "fsm_behaviour";
 
@@ -59,7 +59,8 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			newDirectory = new File(temp_dir);
 		}
 		// Updated ros package directory name with his final name
-		rosPkgName = temp_dir;
+		if(temp_dir != null)
+			rosPkgName = temp_dir;
 		File scriptsDirectory = new File(newDirectory, "scripts");
 		File launchDirectory = new File(newDirectory, "launch");
 		File paramDirectory = new File(newDirectory, "param");
@@ -73,16 +74,13 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		createROSPackage();
 		System.out.println("Created ROS package");
 
-		// (1) Create a list of custom actions, add as many as are needed
+		// Create a list of custom actions, add as many as are needed
 		List<CustomAction> customActions = new ArrayList<CustomAction>();
 		// CustomAction ca = new
 		// CustomAction("http://my.custom-actions.domain/cpswarm/CUSTOM", "input",
 		// Input.class);
 		// customActions.add(ca);
 
-		/*
-		 * build a Document from our xml
-		 */
 		SCXML scxml = null;
 		try {
 			System.out.println("Loading state machine...");
