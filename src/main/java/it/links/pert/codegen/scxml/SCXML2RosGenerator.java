@@ -26,9 +26,10 @@ public class SCXML2RosGenerator implements CodeGenerator {
 
 	final static String FSM_TEMPLATE_FILE = "template/ros/state_machine.vm";
 	final static String PACKAGE_XML_TEMPLATE_FILE = "template/ros/package_xml.vm";
+	final static String CMAKELISTS_TEMPLATE_FILE = "template/ros/cmakelists.vm";
 	final static String SMACH_FILE_NAME = "behaviour.py";
 	final static String ROS_PKG_DEAFULT_NAME = "fsm_behaviour";
-	
+
 	private VelocityEngine ve;
 	private Template template;
 	private String inputPath;
@@ -88,12 +89,28 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}
 	}
-
-	// void createCMakeLists() {
-	// VelocityContext context = new VelocityContext();
-	// }
+	
+	/**
+	 * Create a default CMakeLists.txt file
+	 */
+	void createCMakeLists() {
+		System.out.println("Creating CMakeLists.txt");
+		Template template = ve.getTemplate(CMAKELISTS_TEMPLATE_FILE);
+		VelocityContext context = new VelocityContext();
+		context.put("packageName", ROS_PKG_DEAFULT_NAME);
+		FileWriter writer;
+		try {
+			writer = new FileWriter(rosPkgName + "/CMakeLists.txt");
+			template.merge(context, writer);
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Generate the SMACH python code from scxml file description of a FSM
@@ -101,9 +118,12 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	public boolean generate() {
 		createROSPackage();
 		System.out.println("ROS package created");
-		
+
 		createPackageXML();
 		System.out.println("package.xml created");
+		
+		createCMakeLists();
+		System.out.println("CMakeLists.txt created");
 
 		// Create a list of custom actions, add as many as are needed
 		List<CustomAction> customActions = new ArrayList<CustomAction>();

@@ -3,7 +3,6 @@ package it.links.pert.codegen.scxml;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -42,7 +41,7 @@ class SCXML2RosTests {
 
 	@Test
 	@Order(3)
-	public void testGenerate() throws IOException {
+	public void testGenerate() {
 		generator.generate();
 	}
 	
