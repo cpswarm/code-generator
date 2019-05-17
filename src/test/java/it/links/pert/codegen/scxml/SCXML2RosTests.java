@@ -35,7 +35,9 @@ class SCXML2RosTests {
 	@Test
 	@Order(2)
 	public void testCreateROSPackageWithExistingDir() {
-		assertTrue(generator.createROSPackage());
+		File beahaviour_pkg = new File(OUTPUT_DIR + SCXML2RosGenerator.ROS_PKG_DEAFULT_NAME);
+		if(beahaviour_pkg.exists())
+			assertTrue(generator.createROSPackage());
 	}
 
 	@Test
@@ -43,5 +45,7 @@ class SCXML2RosTests {
 	public void testGenerate() throws IOException {
 		generator.generate();
 	}
+	
+	
 
 }

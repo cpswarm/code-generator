@@ -1,7 +1,5 @@
 package it.links.pert.codegen;
 
-import java.io.IOException;
-
 import it.links.pert.codegen.scxml.SCXML2RosGenerator;
 
 public class App {
@@ -32,13 +30,10 @@ public class App {
 
 		SCXML2RosGenerator generator = new SCXML2RosGenerator(inputPath, outputDir);
 		// URL url = App.class.getClassLoader().getResource(stateMachineFile);
-		try {
-			generator.generate();
+		if(generator.generate())
 			System.out.println("Code generated with success!!");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		else
+			System.out.println("An error occured during code generetion");
 	}
 
 }

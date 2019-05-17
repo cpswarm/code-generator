@@ -24,10 +24,12 @@ import it.links.pert.codegen.generator.CodeGenerator;
 
 public class SCXML2RosGenerator implements CodeGenerator {
 
-	private final static String TEMPLATE_FILE_NAME = "template/ros/state_machine.vm";
-	private final static String SMACH_FILE_NAME = "behaviour.py";
-	private final static String ROS_PKG_DEAFULT_NAME = "fsm_behaviour";
-
+	final static String FSM_TEMPLATE_FILE = "template/ros/state_machine.vm";
+	final static String PACKAGE_XML_TEMPLATE_FILE = "template/ros/package_xml.vm";
+	final static String SMACH_FILE_NAME = "behaviour.py";
+	final static String ROS_PKG_DEAFULT_NAME = "fsm_behaviour";
+	
+	private VelocityEngine ve;
 	private Template template;
 	private String inputPath;
 	private String outputDir;
@@ -37,18 +39,20 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		this.inputPath = inputPath;
 		this.outputDir = outputDir;
 		rosPkgName = ROS_PKG_DEAFULT_NAME;
-		VelocityEngine ve = new VelocityEngine();
+		ve = new VelocityEngine();
 		ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
 		ve.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-		template = ve.getTemplate(TEMPLATE_FILE_NAME);
+		template = ve.getTemplate(FSM_TEMPLATE_FILE);
 		ve.setProperty("space.gobbling", "structured");
 	}
-	
+
 	/**
 	 * Create a new catkin package
+	 * 
 	 * @return true if everything went well
 	 */
 	boolean createROSPackage() {
+		System.out.println("Creating ROS package");
 		File newDirectory = new File(outputDir + rosPkgName);
 		int count = 0;
 		String temp_dir = null;
@@ -59,7 +63,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			newDirectory = new File(temp_dir);
 		}
 		// Updated ros package directory name with his final name
-		if(temp_dir != null)
+		if (temp_dir != null)
 			rosPkgName = temp_dir;
 		File scriptsDirectory = new File(newDirectory, "scripts");
 		File launchDirectory = new File(newDirectory, "launch");
@@ -68,11 +72,38 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	}
 
 	/**
+	 * Create a default package.xml file
+	 */
+	void createPackageXML() {
+		System.out.println("Creating package.xml");
+		Template template = ve.getTemplate(PACKAGE_XML_TEMPLATE_FILE);
+		VelocityContext context = new VelocityContext();
+		context.put("packageName", ROS_PKG_DEAFULT_NAME);
+		FileWriter writer;
+		try {
+			writer = new FileWriter(rosPkgName + "/package.xml");
+			template.merge(context, writer);
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	
+	}
+
+	// void createCMakeLists() {
+	// VelocityContext context = new VelocityContext();
+	// }
+
+	/**
 	 * Generate the SMACH python code from scxml file description of a FSM
 	 */
-	public void generate() throws IOException {
+	public boolean generate() {
 		createROSPackage();
-		System.out.println("Created ROS package");
+		System.out.println("ROS package created");
+		
+		createPackageXML();
+		System.out.println("package.xml created");
 
 		// Create a list of custom actions, add as many as are needed
 		List<CustomAction> customActions = new ArrayList<CustomAction>();
@@ -80,53 +111,42 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		// CustomAction("http://my.custom-actions.domain/cpswarm/CUSTOM", "input",
 		// Input.class);
 		// customActions.add(ca);
-
-		SCXML scxml = null;
 		try {
-			System.out.println("Loading state machine...");
-			System.out.println("path: " + inputPath);
-			InputStream in = new FileInputStream(inputPath);
-			scxml = SCXMLReader.read(in, new SCXMLReader.Configuration(null, null, customActions));
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (ModelException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (XMLStreamException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		/*
-		 * now, make a Context object and populate it.
-		 */
-		VelocityContext context = new VelocityContext();
-		context.put("scxml", scxml);
-
-		// List<State> innerFSM = new LinkedList<>();
-		// context.put("list", innerFSM);
-
-		/*
-		 * make a writer, and merge the template 'against' the context
-		 */
-		// Write to console
-		// Writer writer = null;
-		// writer = new BufferedWriter(new OutputStreamWriter(System.out));
-
-		FileWriter writer = new FileWriter(rosPkgName + "/scripts/" + SMACH_FILE_NAME);
-
-		template.merge(context, writer);
-
-		System.out.println("Writing code in: " + rosPkgName + "/scripts/" + SMACH_FILE_NAME);
-		if (writer != null) {
+			SCXML scxml = null;
 			try {
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
+				System.out.println("Loading state machine...");
+				System.out.println("path: " + inputPath);
+				InputStream in = new FileInputStream(inputPath);
+				scxml = SCXMLReader.read(in, new SCXMLReader.Configuration(null, null, customActions));
+			} catch (ModelException e1) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e1.printStackTrace();
+			} catch (XMLStreamException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
+
+			/*
+			 * Make a Context object and populate it.
+			 */
+			VelocityContext context = new VelocityContext();
+			context.put("scxml", scxml);
+
+			// List<State> innerFSM = new LinkedList<>();
+			// context.put("list", innerFSM);
+
+			/*
+			 * make a writer, and merge the template 'against' the context
+			 */
+			FileWriter writer = new FileWriter(rosPkgName + "/scripts/" + SMACH_FILE_NAME);
+			template.merge(context, writer);
+			System.out.println("Writing code in: " + rosPkgName + "/scripts/" + SMACH_FILE_NAME);
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 }
