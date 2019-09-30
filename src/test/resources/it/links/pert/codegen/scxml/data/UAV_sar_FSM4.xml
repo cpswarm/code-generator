@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml"
+	xmlns:cpswarm="http://my.custom-actions.domain/cpswarm/CUSTOM"
+	version="1.0" initial="TakeOff" name="sar">
+
+	<!-- ****************TAKEOFF ******************** -->
+	<state id="TakeOff">
+		<datamodel>
+			<data id="invoke">
+				<rosaction><name>cmd/takeoff</name><action>TakeOff</action><goal type="fixed"><param>1.1</param></goal>
+				</rosaction>
+			</data>
+			<data id="input"></data>
+		</datamodel>
+		<invoke type="ROS_ACTION" />
+
+	</state>
+
+</scxml>

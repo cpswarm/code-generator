@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml"
+	xmlns:cpswarm="http://my.custom-actions.domain/cpswarm/CUSTOM"
+	version="1.0" initial="SarThreads" name="sar">
+	
+	<!-- ******************** SAR MAIN ******************** -->
+	<parallel id="SarThreads">
+	
+		<!-- ******************** SAR BEHAVIOR ******************** -->
+		<state id="SarBehavior">
+			
+			<parallel id="IdleThreads">
+				<state id="Idle">
+				</state>
+				
+				<state id="IdleEventMonitoring">
+					<datamodel>
+						<data id="invoke"><rosmonitor><topic>bridge/events/target_found</topic><msg>TargetPositionEvent</msg></rosmonitor>
+						</data>
+					</datamodel>
+					<invoke type="ROS_MONITOR" />
+				</state>
+				
+				<transition event="targetFound" target="SelectRover" />
+			</parallel>
+			
+			<state id="SelectRover">
+				<datamodel>
+					<data id="invoke"><rosaction><name>cmd/compute_cost</name><action>ComputeCost</action><goal type="userdata"><var>target_id</var><var>sender_UUID</var><var>pose</var></goal></rosaction>
+					</data>
+				</datamodel>
+				<invoke type="ROS_ACTION" />
+				<transition event="succeeded" target="MoveToTarget" />
+				<transition event="aborted" target="IdleThreads" />
+			</state>
+			
+			<state id="MoveToTarget">
+				<datamodel>
+					<data id="invoke"><rosaction><name>cmd/moveto_target</name><action>GlobalMoveToTarget</action><goal type="userdata"><var>target_id</var><var>pose</var></goal></rosaction>
+					</data>
+				</datamodel>
+				<invoke type="ROS_ACTION" />
+				
+				<transition event="succeeded" target="Idle2" />
+				<transition event="aborted" target="IdleThreads" />
+			</state>
+			
+			<state id="Idle2">
+			</state>
+			
+		</state>
+
+		<!-- ******************** GO HOME EVENT MONITORING ******************** -->
+		<state id="GoHomeEventMonitoring">
+			<datamodel>
+				<data id="invoke"><rosmonitor><topic>bridge/events/go_home</topic><msg>SimpleEvent</msg></rosmonitor>
+				</data>
+			</datamodel>
+			<invoke type="ROS_MONITOR" />
+		</state>
+		
+		<transition event="goHome" target="GoHome" />
+		
+	</parallel>
+	
+	<!-- ******************************* GO HOME *************************************** -->
+	<state id="GoHome">
+		<datamodel>
+			<data id="invoke"><rosaction><name>cmd/moveto</name><action>GlobalMoveTo</action><goal type="callback"></goal></rosaction>
+			</data>
+		</datamodel>
+		<invoke type="ROS_ACTION" />
+	</state>
+
+</scxml>
