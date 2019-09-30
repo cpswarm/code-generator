@@ -3,9 +3,12 @@ package it.links.pert.codegen.scxml;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -16,12 +19,13 @@ import org.junit.jupiter.api.TestMethodOrder;
 class SCXML2RosTests {
 
 	private static final String INPUT_PATH = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM.xml";
-	private static final String OUTPUT_DIR = "generated/test/";
+	private static final String OUTPUT_DIR = "test_tmp/";
+	private static File testDirectory;
 	private static SCXML2RosGenerator generator;
 
 	@BeforeAll
-	static void createTestDir() {
-		File testDirectory = new File(OUTPUT_DIR);
+	static void setup() {
+		testDirectory = new File(OUTPUT_DIR);
 		if (!testDirectory.exists()) {
 			testDirectory.mkdir();
 		}
@@ -31,6 +35,18 @@ class SCXML2RosTests {
 	static void createGeneratorInstance() {
 		Path resourceDirectory = Paths.get("src","test","resources");
 		generator = new SCXML2RosGenerator(resourceDirectory + INPUT_PATH, OUTPUT_DIR);
+	}
+	
+	@AfterAll
+	static void tearDown() {
+		if (testDirectory.exists()) {
+			try {
+				FileUtils.deleteDirectory(testDirectory);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Test
