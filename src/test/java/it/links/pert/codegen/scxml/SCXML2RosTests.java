@@ -3,6 +3,8 @@ package it.links.pert.codegen.scxml;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -13,9 +15,9 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(OrderAnnotation.class)
 class SCXML2RosTests {
 
-	private static final String INPUT_PATH = "input/scxml/test/UAV_sar_FSM.xml";
+	private static final String INPUT_PATH = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM.xml";
 	private static final String OUTPUT_DIR = "generated/test/";
-	private final SCXML2RosGenerator generator = new SCXML2RosGenerator(INPUT_PATH, OUTPUT_DIR);
+	private static SCXML2RosGenerator generator;
 
 	@BeforeAll
 	static void createTestDir() {
@@ -23,6 +25,12 @@ class SCXML2RosTests {
 		if (!testDirectory.exists()) {
 			testDirectory.mkdir();
 		}
+	}
+	
+	@BeforeAll
+	static void createGeneratorInstance() {
+		Path resourceDirectory = Paths.get("src","test","resources");
+		generator = new SCXML2RosGenerator(resourceDirectory + INPUT_PATH, OUTPUT_DIR);
 	}
 
 	@Test

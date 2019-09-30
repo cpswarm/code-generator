@@ -55,17 +55,14 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	boolean createROSPackage() {
 		System.out.println("Creating ROS package");
 		File newDirectory = new File(outputDir + rosPkgName);
-		int count = 0;
+		int count = 1;
 		String temp_dir = null;
 		// If this package name already exist add a number at the end
 		while (newDirectory.exists()) {
-			count++;
-			temp_dir = outputDir + rosPkgName + count;
+			rosPkgName = ROS_PKG_DEAFULT_NAME + count++;
+			temp_dir = outputDir + rosPkgName;
 			newDirectory = new File(temp_dir);
 		}
-		// Updated ros package directory name with his final name
-		if (temp_dir != null)
-			rosPkgName = temp_dir;
 		File scriptsDirectory = new File(newDirectory, "scripts");
 		File launchDirectory = new File(newDirectory, "launch");
 		File paramDirectory = new File(newDirectory, "param");
@@ -82,7 +79,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		context.put("packageName", ROS_PKG_DEAFULT_NAME);
 		FileWriter writer;
 		try {
-			writer = new FileWriter(rosPkgName + "/package.xml");
+			writer = new FileWriter(outputDir + rosPkgName + "/package.xml");
 			template.merge(context, writer);
 			writer.flush();
 			writer.close();
@@ -102,7 +99,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		context.put("packageName", ROS_PKG_DEAFULT_NAME);
 		FileWriter writer;
 		try {
-			writer = new FileWriter(rosPkgName + "/CMakeLists.txt");
+			writer = new FileWriter(outputDir + rosPkgName + "/CMakeLists.txt");
 			template.merge(context, writer);
 			writer.flush();
 			writer.close();
@@ -158,9 +155,9 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			/*
 			 * make a writer, and merge the template 'against' the context
 			 */
-			FileWriter writer = new FileWriter(rosPkgName + "/scripts/" + SMACH_FILE_NAME);
+			FileWriter writer = new FileWriter(outputDir + rosPkgName + "/scripts/" + SMACH_FILE_NAME);
 			template.merge(context, writer);
-			System.out.println("Writing code in: " + rosPkgName + "/scripts/" + SMACH_FILE_NAME);
+			System.out.println("Writing code in: " + outputDir + rosPkgName + "/scripts/" + SMACH_FILE_NAME);
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
