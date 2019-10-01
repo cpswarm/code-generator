@@ -1,10 +1,11 @@
 package it.links.pert.codegen.scxml;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +20,14 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import it.links.pert.codegen.generator.CodeGenerator;
 
 public class SCXML2RosGenerator implements CodeGenerator {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SCXML2RosGenerator.class.getName());
 
 	final static String FSM_TEMPLATE_FILE = "template/ros/state_machine.vm";
 	final static String PACKAGE_XML_TEMPLATE_FILE = "template/ros/package_xml.vm";
@@ -53,15 +58,15 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	 * @return true if everything went well
 	 */
 	boolean createROSPackage() {
-		System.out.println("Creating ROS package");
+		LOGGER.info("Creating ROS package");
 		File newDirectory = new File(outputDir + rosPkgName);
 		int count = 1;
-		String temp_dir = null;
+		String tmpDir = null;
 		// If this package name already exist add a number at the end
 		while (newDirectory.exists()) {
 			rosPkgName = ROS_PKG_DEAFULT_NAME + count++;
-			temp_dir = outputDir + rosPkgName;
-			newDirectory = new File(temp_dir);
+			tmpDir = outputDir + rosPkgName;
+			newDirectory = new File(tmpDir);
 		}
 		File scriptsDirectory = new File(newDirectory, "scripts");
 		File launchDirectory = new File(newDirectory, "launch");
@@ -73,13 +78,13 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	 * Create a default package.xml file
 	 */
 	void createPackageXML() {
-		System.out.println("Creating package.xml");
+		LOGGER.info("Creating package.xml");
 		Template template = ve.getTemplate(PACKAGE_XML_TEMPLATE_FILE);
 		VelocityContext context = new VelocityContext();
 		context.put("packageName", ROS_PKG_DEAFULT_NAME);
-		FileWriter writer;
+		BufferedWriter writer;
 		try {
-			writer = new FileWriter(outputDir + rosPkgName + "/package.xml");
+			writer =  Files.newBufferedWriter(Paths.get(outputDir + rosPkgName + "/package.xml"));
 			template.merge(context, writer);
 			writer.flush();
 			writer.close();
@@ -93,13 +98,13 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	 * Create a default CMakeLists.txt file
 	 */
 	void createCMakeLists() {
-		System.out.println("Creating CMakeLists.txt");
+		LOGGER.info("Creating CMakeLists.txt");
 		Template template = ve.getTemplate(CMAKELISTS_TEMPLATE_FILE);
 		VelocityContext context = new VelocityContext();
 		context.put("packageName", ROS_PKG_DEAFULT_NAME);
-		FileWriter writer;
+		BufferedWriter writer;
 		try {
-			writer = new FileWriter(outputDir + rosPkgName + "/CMakeLists.txt");
+			writer = Files.newBufferedWriter(Paths.get(outputDir + rosPkgName + "/CMakeLists.txt"));
 			template.merge(context, writer);
 			writer.flush();
 			writer.close();
@@ -114,13 +119,13 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	 */
 	public boolean generate() {
 		createROSPackage();
-		System.out.println("ROS package created");
+		LOGGER.info("ROS package created");
 
 		createPackageXML();
-		System.out.println("package.xml created");
+		LOGGER.info("package.xml created");
 		
 		createCMakeLists();
-		System.out.println("CMakeLists.txt created");
+		LOGGER.info("CMakeLists.txt created");
 
 		// Create a list of custom actions, add as many as are needed
 		List<CustomAction> customActions = new ArrayList<CustomAction>();
@@ -131,9 +136,9 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		try {
 			SCXML scxml = null;
 			try {
-				System.out.println("Loading state machine...");
-				System.out.println("path: " + inputPath);
-				InputStream in = new FileInputStream(inputPath);
+				LOGGER.info("Loading state machine...");
+				LOGGER.info("path: " + inputPath);
+				InputStream in = Files.newInputStream(Paths.get(inputPath));
 				scxml = SCXMLReader.read(in, new SCXMLReader.Configuration(null, null, customActions));
 			} catch (ModelException e1) {
 				// TODO Auto-generated catch block
@@ -155,9 +160,9 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			/*
 			 * make a writer, and merge the template 'against' the context
 			 */
-			FileWriter writer = new FileWriter(outputDir + rosPkgName + "/scripts/" + SMACH_FILE_NAME);
+			BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputDir + rosPkgName + "/scripts/" + SMACH_FILE_NAME));
 			template.merge(context, writer);
-			System.out.println("Writing code in: " + outputDir + rosPkgName + "/scripts/" + SMACH_FILE_NAME);
+			LOGGER.info("Writing code in: " + outputDir + rosPkgName + "/scripts/" + SMACH_FILE_NAME);
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {

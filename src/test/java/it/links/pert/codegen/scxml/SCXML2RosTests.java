@@ -24,7 +24,7 @@ class SCXML2RosTests {
 	private static SCXML2RosGenerator generator;
 
 	@BeforeAll
-	static void setup() {
+	static void setUp() {
 		testDirectory = new File(OUTPUT_DIR);
 		if (!testDirectory.exists()) {
 			testDirectory.mkdir();
@@ -33,7 +33,7 @@ class SCXML2RosTests {
 	
 	@BeforeAll
 	static void createGeneratorInstance() {
-		Path resourceDirectory = Paths.get("src","test","resources");
+		final Path resourceDirectory = Paths.get("src","test","resources");
 		generator = new SCXML2RosGenerator(resourceDirectory + INPUT_PATH, OUTPUT_DIR);
 	}
 	
@@ -58,8 +58,8 @@ class SCXML2RosTests {
 	@Test
 	@Order(2)
 	public void testCreateROSPackageWithExistingDir() {
-		File beahaviour_pkg = new File(OUTPUT_DIR + SCXML2RosGenerator.ROS_PKG_DEAFULT_NAME);
-		if(beahaviour_pkg.exists())
+		final File beahaviorPkg = new File(OUTPUT_DIR + SCXML2RosGenerator.ROS_PKG_DEAFULT_NAME);
+		if(beahaviorPkg.exists())
 			assertTrue(generator.createROSPackage());
 	}
 

@@ -157,7 +157,7 @@
 							<archive>
 								<manifest>
 									<mainClass>
-										it.links.pert.codegen.App
+										it.links.pert.codegen.CodeGeneratorApp
 									</mainClass>
 								</manifest>
 							</archive>
