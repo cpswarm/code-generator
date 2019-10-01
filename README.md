@@ -4,7 +4,7 @@ The first version of the Code Generator supports the generation of code starting
 This project is currently under active development and not ready for production.
 
 ## Getting Started
-* Documentation: [wiki](https://git.repository-pert.ismb.it/CPSwarm/code-generator/wikis/home)
+* Documentation: [wiki]
 
 ## Deployment
 Packages are built continuously with [Bamboo](https://pipelines.linksmart.eu/browse/CPSW-CGB/latest).
@@ -13,7 +13,7 @@ Packages are built continuously with [Bamboo](https://pipelines.linksmart.eu/bro
 The project is a Maven project, based on Java 8. To compile it you need to have: 
 
 * [Java 8 JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-* [Maven](https://maven.apache.org/).
+* [Maven](https://maven.apache.org/)
 
 ### Build from source
 Within the root of the repository, the project can be easily built using the following Maven commands.
@@ -36,7 +36,7 @@ usage: java -jar code-generator.jar
 And this is an example of running command
 
 ``` bash
-java -jar /home/gprato/cpswarm-ws/code-generator-0.0.1-SNAPSHOT-full.jar --src /home/cpswarm/launcher_project/Models/UAV_sar_FSM.xml --target /home/cpswarm/launcher_project/GeneratedCode
+java -jar /home/cpswarm-ws/code-generator-0.0.1-full.jar --env ROS --src /home/cpswarm-ws/models/UAV_sar_FSM.xml --target /home/cpswarm-ws/GeneratedCode
 ```
 
 ## Development
