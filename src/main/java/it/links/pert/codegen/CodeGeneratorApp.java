@@ -8,6 +8,12 @@ import it.links.pert.codegen.scxml.SCXML2RosGenerator;
 public class CodeGeneratorApp {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeGeneratorApp.class.getName());
+	
+	/*
+	 * Private constructor
+	 */
+	private CodeGeneratorApp() {
+	}
 
 	public static void main(String[] args) {
 
@@ -20,19 +26,19 @@ public class CodeGeneratorApp {
 
 		while (i < args.length && args[i].startsWith("--")) {
 			arg = args[i++];
-			if (arg.equals("--src")) {
+			if ("--src".equals(arg)) {
 				if (i < args.length) {
 					inputPath = args[i++];
 				} else {
 					LOGGER.error("--src requires a file path");
 				}
-			} else if (arg.equals("--target")) {
+			} else if ("--target".equals(arg)) {
 				if (i < args.length) {
 					outputDir = args[i++];
 				} else {
 					LOGGER.error("--target requires a directory path");
 				}
-			} else if (arg.equals("--env")) {
+			} else if ("--env".equals(arg)) {
 				if (i < args.length) {
 					runtimeEnv = args[i++];
 				} else {
@@ -52,10 +58,11 @@ public class CodeGeneratorApp {
 		}
 
 		// URL url = App.class.getClassLoader().getResource(stateMachineFile);
-		if (generator.generate())
+		if (generator.generate()) {
 			LOGGER.info("Code generated with success!!");
-		else
+		} else {
 			LOGGER.info("An error occured during code generation");
+		}
 	}
 
 }

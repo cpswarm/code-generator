@@ -2,6 +2,6 @@ package it.links.pert.codegen.generator;
 
 public interface CodeGenerator {
 	
-	public boolean generate();
+	boolean generate();
 
 }
