@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,8 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import it.links.pert.codegen.generator.CodeGenerator;
 
@@ -49,18 +50,22 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
 		engine.setProperty("space.gobbling", "structured");
 	}
+	
+	protected boolean createNewROSPackage() {
+		return true;
+	}
 
 	/**
-	 * Create a new catkin package
+	 * Create a new ROS package directory structure
 	 * 
 	 * @return true if everything went well
 	 */
-	protected boolean createROSPackage() {
+	protected boolean mkROSPackageDirs() {
 		LOGGER.info("Creating ROS package");
 		File newDirectory = new File(outputDir + rosPkgName);
 		int count = 1;
 		String tmpDir = null;
-		// If this package name already exist add a number at the end
+		// If this package name already exists add a number at the end
 		while (newDirectory.exists()) {
 			rosPkgName = ROS_PKG_DEAFULT_NAME + count++;
 			tmpDir = outputDir + rosPkgName;
@@ -69,41 +74,48 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		final File scriptsDirectory = new File(newDirectory, "scripts");
 		final File launchDirectory = new File(newDirectory, "launch");
 		final File paramDirectory = new File(newDirectory, "param");
-		return scriptsDirectory.mkdirs() && launchDirectory.mkdir() && paramDirectory.mkdir();
+		return scriptsDirectory.mkdirs() && launchDirectory.mkdir() && paramDirectory.mkdir() && newDirectory.exists();
 	}
 
 	/**
 	 * Create a default package.xml file
 	 */
-	protected void createPackageXML() {
+	protected boolean createPackageXML() {
 		LOGGER.info("Creating package.xml");
 		final Template template = engine.getTemplate(PACKAGE_XML_TEMPLATE_FILE);
 		final VelocityContext context = new VelocityContext();
 		context.put("packageName", ROS_PKG_DEAFULT_NAME);
-		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputDir + rosPkgName + "/package.xml"));) {
+		Path path = Paths.get(outputDir + rosPkgName + "/package.xml");
+		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
 			template.merge(context, writer);
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
 			LOGGER.error("Error:", e);
+			return false;
 		}
+		return Files.exists(path);
 	}
 
 	/**
 	 * Create a default CMakeLists.txt file
+	 * @return 
 	 */
-	protected void createCMakeLists() {
+	protected boolean createCMakeLists() {
 		LOGGER.info("Creating CMakeLists.txt");
 		final Template template = engine.getTemplate(CMAKELISTS_TEMPLATE_FILE);
 		final VelocityContext context = new VelocityContext();
 		context.put("packageName", ROS_PKG_DEAFULT_NAME);
-		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(outputDir + rosPkgName + "/CMakeLists.txt"));) {
+		Path path = Paths.get(outputDir + rosPkgName + "/CMakeLists.txt");
+		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
 			template.merge(context, writer);
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
 			LOGGER.error("Error:", e);
+			return false;
 		}
+		return Files.exists(path);
 	}
 
 	/**
@@ -111,7 +123,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	 */
 	@Override
 	public boolean generate() {
-		createROSPackage();
+		mkROSPackageDirs();
 		LOGGER.info("ROS package created");
 
 		createPackageXML();
