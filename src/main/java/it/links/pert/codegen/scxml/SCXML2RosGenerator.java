@@ -50,9 +50,9 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
 		engine.setProperty("space.gobbling", "structured");
 	}
-	
+
 	protected boolean createNewROSPackage() {
-		return true;
+		return mkROSPackageDirs() && createPackageXML() && createCMakeLists();
 	}
 
 	/**
@@ -60,8 +60,8 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	 * 
 	 * @return true if everything went well
 	 */
-	protected boolean mkROSPackageDirs() {
-		LOGGER.info("Creating ROS package");
+	private boolean mkROSPackageDirs() {
+		LOGGER.info("Creating ROS package directories");
 		File newDirectory = new File(outputDir + rosPkgName);
 		int count = 1;
 		String tmpDir = null;
@@ -80,101 +80,88 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	/**
 	 * Create a default package.xml file
 	 */
-	protected boolean createPackageXML() {
+	private boolean createPackageXML() {
 		LOGGER.info("Creating package.xml");
 		final Template template = engine.getTemplate(PACKAGE_XML_TEMPLATE_FILE);
 		final VelocityContext context = new VelocityContext();
 		context.put("packageName", ROS_PKG_DEAFULT_NAME);
-		Path path = Paths.get(outputDir + rosPkgName + "/package.xml");
+		final Path path = Paths.get(outputDir + rosPkgName + "/package.xml");
 		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
 			template.merge(context, writer);
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
 			LOGGER.error("Error:", e);
-			return false;
 		}
 		return Files.exists(path);
 	}
 
 	/**
 	 * Create a default CMakeLists.txt file
-	 * @return 
+	 * 
+	 * @return
 	 */
-	protected boolean createCMakeLists() {
+	private boolean createCMakeLists() {
 		LOGGER.info("Creating CMakeLists.txt");
 		final Template template = engine.getTemplate(CMAKELISTS_TEMPLATE_FILE);
 		final VelocityContext context = new VelocityContext();
 		context.put("packageName", ROS_PKG_DEAFULT_NAME);
-		Path path = Paths.get(outputDir + rosPkgName + "/CMakeLists.txt");
+		final Path path = Paths.get(outputDir + rosPkgName + "/CMakeLists.txt");
 		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
 			template.merge(context, writer);
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
 			LOGGER.error("Error:", e);
-			return false;
 		}
 		return Files.exists(path);
 	}
 
 	/**
-	 * Generate the SMACH python code from scxml file description of a FSM
+	 * Generate the SMACH python code from scxml file description of a FSM and put
+	 * it in a new catkin ROS package
 	 */
 	@Override
 	public boolean generate() {
-		mkROSPackageDirs();
-		LOGGER.info("ROS package created");
+		boolean success = true;
 
-		createPackageXML();
-		LOGGER.info("package.xml created");
+		// Create new ROS package to contain generated algorithm
+		success = createNewROSPackage();
+		if (success) {
+			// Create a list of custom actions, add as many as are needed
+			final List<CustomAction> customActions = new ArrayList<>();
+			// CustomAction ca = new
+			// CustomAction("http://my.custom-actions.domain/cpswarm/CUSTOM", "input",
+			// Input.class);
+			// customActions.add(ca);
 
-		createCMakeLists();
-		LOGGER.info("CMakeLists.txt created");
-
-		// Create a list of custom actions, add as many as are needed
-		List<CustomAction> customActions = new ArrayList<CustomAction>();
-		// CustomAction ca = new
-		// CustomAction("http://my.custom-actions.domain/cpswarm/CUSTOM", "input",
-		// Input.class);
-		// customActions.add(ca);
-
-		final Template template = engine.getTemplate(PACKAGE_XML_TEMPLATE_FILE);
-		try {
-			SCXML scxml = null;
-			try (InputStream inputFile = Files.newInputStream(Paths.get(inputPath));){
+			final Template template = engine.getTemplate(PACKAGE_XML_TEMPLATE_FILE);
+			try (InputStream inputFile = Files.newInputStream(Paths.get(inputPath));) {
 				LOGGER.info("Loading state machine...");
 				LOGGER.info("path: " + inputPath);
+				SCXML scxml;
 				scxml = SCXMLReader.read(inputFile, new SCXMLReader.Configuration(null, null, customActions));
 				inputFile.close();
-			} catch (ModelException e) {
+
+				/*
+				 * Make a Context object and populate it.
+				 */
+				final VelocityContext context = new VelocityContext();
+				context.put("scxml", scxml);
+				/*
+				 * make a writer, and merge the template 'against' the context
+				 */
+				String path = outputDir + rosPkgName + "/scripts/" + SMACH_FILE_NAME;
+				final BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));
+				template.merge(context, writer);
+				LOGGER.info("Writing code in: " + path);
+				writer.flush();
+				writer.close();
+			} catch (IOException | ModelException | XMLStreamException e) {
 				LOGGER.error("Error:", e);
-			} catch (XMLStreamException e) {
-				LOGGER.error("Error:", e);
+				success = false;
 			}
-
-			/*
-			 * Make a Context object and populate it.
-			 */
-			final VelocityContext context = new VelocityContext();
-			context.put("scxml", scxml);
-
-			// List<State> innerFSM = new LinkedList<>();
-			// context.put("list", innerFSM);
-
-			/*
-			 * make a writer, and merge the template 'against' the context
-			 */
-			final BufferedWriter writer = Files
-					.newBufferedWriter(Paths.get(outputDir + rosPkgName + "/scripts/" + SMACH_FILE_NAME));
-			template.merge(context, writer);
-			LOGGER.info("Writing code in: " + outputDir + rosPkgName + "/scripts/" + SMACH_FILE_NAME);
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			LOGGER.error("Error:", e);
-			return false;
 		}
-		return true;
+		return success;
 	}
 }
