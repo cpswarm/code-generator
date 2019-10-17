@@ -50,6 +50,10 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
 		engine.setProperty("space.gobbling", "lines");
 	}
+	
+	protected String getLastDirectoryCreated() {
+		return rosPkgName;
+	}
 
 	/**
 	 * Create a new minimal catkin ROS package
