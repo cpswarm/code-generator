@@ -99,7 +99,7 @@
 				<invoke type="ROS_ACTION" />
 				
 				<transition event="aborted" target="Coverage" />
-				<transition event="succeeded" target="SelectRover" />
+				<transition event="succeeded" target="Tracking" />
 			</state>
 								
 		</state>
