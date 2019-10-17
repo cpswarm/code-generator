@@ -13,7 +13,7 @@
 			#else$service_content.item(2).getChildNodes().item($i).getFirstChild().getNodeValue(), #end
 		#end
 	#elseif($service_content.item(2).getAttributes().item(0).getNodeValue() == "userdata")
-	${indent}$service_content.item(1).getFirstChild().getNodeValue(),
+		${indent}$service_content.item(1).getFirstChild().getNodeValue(),
 		#set($last = $service_content.item(2).getChildNodes().getLength() - 1)
 		${indent}request_slots=[#foreach($i in [0..$last])
 			#if($i == $last)'$service_content.item(2).getChildNodes().item($i).getFirstChild().getNodeValue()'])#if($continue),#end
@@ -21,5 +21,5 @@
 		#end
 	#elseif($service_content.item(2).getAttributes().item(0).getNodeValue() == "callback")
 		${indent}$service_content.item(1).getFirstChild().getNodeValue(),
-		${indent}request_cb=$service_content.item(1).getFirstChild().getNodeValue().toLowerCase()_cb)#if($continue),#end	
+		${indent}request_cb=$service_content.item(1).getFirstChild().getNodeValue().toLowerCase()_cb)#if($continue),#end
 	#end

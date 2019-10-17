@@ -9,6 +9,7 @@ import mavros_msgs
 from cpswarm_msgs.msg import *
 from swarmros.msg import *
 
+
 # define state Idle
 class Idle(smach.State):
 
@@ -26,6 +27,7 @@ class Idle(smach.State):
 			rospy.sleep(1.0)
 			
 		return 'succeeded'
+		
 
 def main():
 	rospy.init_node('state_machine_node')
@@ -48,15 +50,16 @@ def main():
 #end
 	
 	# Create and start the introspection server (uncomment if needed)
-	#sis = smach_ros.IntrospectionServer('smach_server', top_sm, '/SM_TOP')
-	#sis.start()
+	# sis = smach_ros.IntrospectionServer('smach_server', top_sm, '/SM_TOP')
+	# sis.start()
 	
 	# Execute SMACH plan
 	outcome = top_sm.execute()
 
 	# Wait for ctrl-c to stop the application
 	rospy.spin()
-	#sis.stop()
+	# sis.stop()
+	
 	
 if __name__ == '__main__':
 	try:
@@ -69,10 +72,9 @@ if __name__ == '__main__':
 #macro(parallelState $state $indent)
 
 ${indent}#  ===================================== ${state.id} =====================================
-${indent}#Callback for custom outcomes from ${state.id}
+${indent}# Callback for custom outcomes from ${state.id} #
 ${indent}def out_cb(outcome_map):
-	${indent}#To be completed
-
+	${indent}# To be completed
 	${indent}return 'aborted'
 
 ${indent}# Create a Concurrence container
@@ -88,7 +90,7 @@ ${indent}${state.id.toLowerCase()}_concurrence = smach.Concurrence(
 	${indent}child_termination_cb=lambda so: True,
 	${indent}outcome_cb=out_cb)
 #end
-	
+
 ${indent}# Open the container
 ${indent}with ${state.id.toLowerCase()}_concurrence:
 	#foreach($sub_state in $state.children)
