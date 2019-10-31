@@ -91,7 +91,13 @@
 			<artifactId>commons-logging</artifactId>
 			<version>1.2</version>
 		</dependency>
-
+		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<!-- commons-scxml2 lib-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-scxml2</artifactId>
