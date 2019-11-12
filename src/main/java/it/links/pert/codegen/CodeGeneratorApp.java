@@ -32,7 +32,7 @@ public class CodeGeneratorApp {
 				} else {
 					LOGGER.error("--src requires a file path");
 				}
-			} else if ("--target".equals(arg)) {
+			} else if ("--output".equals(arg)) {
 				if (i < args.length) {
 					outputDir = args[i++];
 				} else {
