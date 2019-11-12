@@ -21,6 +21,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,6 +125,20 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			LOGGER.error("Error:", e);
 		}
 		return Files.exists(path);
+	}
+	
+	protected boolean createROSFunctions(SCXML scxml, JSONArray functionList) {
+		//TODO to be completed
+		for(int i=0; i< functionList.size(); i++) {
+			
+		}
+		return false;
+	}
+	
+	private boolean createROSActionSkeleton() {
+		//TODO to be completed
+
+		return false;
 	}
 
 	/**
