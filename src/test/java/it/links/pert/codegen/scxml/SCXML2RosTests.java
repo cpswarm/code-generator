@@ -58,7 +58,8 @@ class SCXML2RosTests {
 	@Test
 	@Order(2)
 	public void testCreateROSPackageWithExistingDir() {
-		final File beahaviorPkg = new File(OUTPUT_DIR + SCXML2RosGenerator.ROS_PKG_DEAFULT_NAME);
+		assertTrue(generator.createNewROSPackage());
+		final File beahaviorPkg = new File(OUTPUT_DIR + generator.getLastGeneratedPkgName());
 		if (beahaviorPkg.exists())
 			assertTrue(generator.createNewROSPackage());
 		else {
@@ -77,7 +78,7 @@ class SCXML2RosTests {
 	public void validateGeneratedFiles() {
 		generator.generate();
 
-		final String base_dir_path = OUTPUT_DIR + generator.getLastDirectoryCreated();
+		final String base_dir_path = OUTPUT_DIR + generator.getLastGeneratedPkgName();
 		final Path resourceDirectory = Paths.get("src", "test", "resources");
 		// Test generated behaviour against reference file
 		final File behaviour = new File(base_dir_path + "/scripts/" + SCXML2RosGenerator.SMACH_FILE_NAME);
