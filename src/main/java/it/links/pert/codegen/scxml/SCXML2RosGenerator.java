@@ -37,22 +37,42 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	protected final static String ROS_PKG_DEAFULT_NAME = "fsm_behaviour";
 
 	private final VelocityEngine engine;
-	private final String inputPath;
+	private final String scxmlPath;
 	private final String outputDir;
-	private String rosPkgName;
+	//Initial name for new generated ROS packages
+	private String initialRosPkgName;
+	//Last generated package name (to allow multiple generation using the same SCXML2RosGenerator instance)
+	private String currentRosPkgName;
 
-	public SCXML2RosGenerator(final String inputPath, final String outputDir) {
-		this.inputPath = inputPath;
+	public SCXML2RosGenerator(final String scxmlPath, final String outputDir) {
+		this(scxmlPath, outputDir, ROS_PKG_DEAFULT_NAME);
+	}
+	
+	public SCXML2RosGenerator(final String scxmlPath, final String outputDir, final String rosPkgName) {
+		final File scxmlFile = new File(scxmlPath);
+		if (!scxmlFile.exists()) {
+			throw new IllegalArgumentException("scxml path must be an existing file");
+		}
+		this.scxmlPath = scxmlPath;
 		this.outputDir = outputDir;
-		rosPkgName = ROS_PKG_DEAFULT_NAME;
+		this.initialRosPkgName = rosPkgName;
+		this.currentRosPkgName = rosPkgName;
 		engine = new VelocityEngine();
 		engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
 		engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
 		engine.setProperty("space.gobbling", "lines");
 	}
 	
-	protected String getLastDirectoryCreated() {
-		return rosPkgName;
+	public void setInitialRosPkgName(final String initialRosPkgName) {
+		this.initialRosPkgName = initialRosPkgName;
+	}
+
+	/**
+	 * 
+	 * @return String name of the last generated ROS pkg
+	 */
+	protected String getLastGeneratedPkgName() {
+		return currentRosPkgName;
 	}
 
 	/**
@@ -71,13 +91,13 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	 */
 	private boolean mkROSPackageDirs() {
 		LOGGER.info("Creating ROS package directories");
-		File newDirectory = new File(outputDir + rosPkgName);
+		File newDirectory = new File(outputDir + initialRosPkgName);
 		int count = 1;
 		String tmpDir = null;
 		// If this package name already exists add a number at the end
 		while (newDirectory.exists()) {
-			rosPkgName = ROS_PKG_DEAFULT_NAME + count++;
-			tmpDir = outputDir + rosPkgName;
+			currentRosPkgName = initialRosPkgName + count++;
+			tmpDir = outputDir + currentRosPkgName;
 			newDirectory = new File(tmpDir);
 		}
 		final File scriptsDirectory = new File(newDirectory, "scripts");
@@ -96,7 +116,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		final Template template = engine.getTemplate(PACKAGE_XML_TEMPLATE_FILE);
 		final VelocityContext context = new VelocityContext();
 		context.put("packageName", ROS_PKG_DEAFULT_NAME);
-		final Path path = Paths.get(outputDir + rosPkgName + "/package.xml");
+		final Path path = Paths.get(outputDir + currentRosPkgName + "/package.xml");
 		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
 			template.merge(context, writer);
 			writer.flush();
@@ -116,7 +136,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		final Template template = engine.getTemplate(CMAKELISTS_TEMPLATE_FILE);
 		final VelocityContext context = new VelocityContext();
 		context.put("packageName", ROS_PKG_DEAFULT_NAME);
-		final Path path = Paths.get(outputDir + rosPkgName + "/CMakeLists.txt");
+		final Path path = Paths.get(outputDir + currentRosPkgName + "/CMakeLists.txt");
 		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
 			template.merge(context, writer);
 			writer.flush();
@@ -145,9 +165,9 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			// CustomAction("http://my.custom-actions.domain/cpswarm/CUSTOM", "input",
 			// Input.class);
 			// customActions.add(ca);
-			try (InputStream inputFile = Files.newInputStream(Paths.get(inputPath));) {
+			try (InputStream inputFile = Files.newInputStream(Paths.get(scxmlPath));) {
 				LOGGER.info("Loading state machine...");
-				LOGGER.info("path: " + inputPath);
+				LOGGER.info("path: " + scxmlPath);
 				SCXML scxml;
 				scxml = SCXMLReader.read(inputFile, new SCXMLReader.Configuration(null, null, customActions));
 				/*
@@ -158,7 +178,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 				/*
 				 * make a writer, and merge the template 'against' the context
 				 */
-				final String path = outputDir + rosPkgName + "/scripts/" + SMACH_FILE_NAME;
+				final String path = outputDir + currentRosPkgName + "/scripts/" + SMACH_FILE_NAME;
 				try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));) {
 					final Template template = engine.getTemplate(FSM_TEMPLATE_FILE);
 					template.merge(context, writer);

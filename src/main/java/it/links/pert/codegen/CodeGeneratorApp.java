@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import it.links.pert.codegen.generator.CodeGenerator;
 import it.links.pert.codegen.scxml.SCXML2RosGenerator;
 
-public class CodeGeneratorApp {
+public final class CodeGeneratorApp {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeGeneratorApp.class.getName());
 	
@@ -17,7 +17,7 @@ public class CodeGeneratorApp {
 
 	public static void main(String[] args) {
 
-		String inputPath = null;
+		String scxmlPath = null;
 		String outputDir = null;
 		String runtimeEnv = null;
 
@@ -26,17 +26,17 @@ public class CodeGeneratorApp {
 
 		while (i < args.length && args[i].startsWith("--")) {
 			arg = args[i++];
-			if ("--src".equals(arg)) {
+			if ("--scxml".equals(arg)) {
 				if (i < args.length) {
-					inputPath = args[i++];
+					scxmlPath = args[i++];
 				} else {
-					LOGGER.error("--src requires a file path");
+					LOGGER.error("--scxml requires a valid file path");
 				}
 			} else if ("--output".equals(arg)) {
 				if (i < args.length) {
 					outputDir = args[i++];
 				} else {
-					LOGGER.error("--target requires a directory path");
+					LOGGER.error("--output requires an existing directory path");
 				}
 			} else if ("--env".equals(arg)) {
 				if (i < args.length) {
@@ -51,10 +51,10 @@ public class CodeGeneratorApp {
 
 		switch (runtimeEnv) {
 		case "ROS":
-			generator = new SCXML2RosGenerator(inputPath, outputDir);
+			generator = new SCXML2RosGenerator(scxmlPath, outputDir);
 			break;
 		default:
-			generator = new SCXML2RosGenerator(inputPath, outputDir);
+			generator = new SCXML2RosGenerator(scxmlPath, outputDir);
 		}
 
 		// URL url = App.class.getClassLoader().getResource(stateMachineFile);
