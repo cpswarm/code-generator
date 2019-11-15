@@ -147,12 +147,10 @@ ${indent}smach.StateMachine.add('${state.id}',
 			#set($service_content = $state.getDatamodel().getData().get(0).getParsedValue().getValue().getChildNodes())
 			#set($continue=true)
 			#parse("template/ros/atomic/ROS_service_state.vm")
-
 		#elseif($state.invokes[0].type == "ROS_ACTION")
 			#set($action_content = $state.getDatamodel().getData().get(0).getParsedValue().getValue().getChildNodes())
 			#set($continue=true)
 			#parse("template/ros/atomic/ROS_action_state.vm")
-
 		#else
 	${indent}# NOT_SUPPORTED
 		#end

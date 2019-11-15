@@ -58,9 +58,9 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		this.initialRosPkgName = rosPkgName;
 		this.currentRosPkgName = rosPkgName;
 		engine = new VelocityEngine();
-		engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-		engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-		engine.setProperty("space.gobbling", "lines");
+		engine.setProperty(RuntimeConstants.RESOURCE_LOADERS, "classpath");
+		engine.setProperty("resource.loader.classpath.class", ClasspathResourceLoader.class.getName());
+		engine.setProperty("parser.space_gobbling", "lines");
 	}
 	
 	public void setInitialRosPkgName(final String initialRosPkgName) {
