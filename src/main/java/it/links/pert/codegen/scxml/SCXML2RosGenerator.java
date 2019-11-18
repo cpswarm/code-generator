@@ -1,5 +1,6 @@
 package it.links.pert.codegen.scxml;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.JsonArray;
 
 import it.links.pert.codegen.generator.CodeGenerator;
+import it.links.pert.codegen.json.ADFReader;
 
 public class SCXML2RosGenerator implements CodeGenerator {
 
@@ -42,16 +44,18 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	private final String scxmlPath;
 	private final String adfPath;
 	private final String outputDir;
-	//Initial name for new generated ROS packages
+	// Initial name for new generated ROS packages
 	private String initialRosPkgName;
-	//Last generated package name (to allow multiple generation using the same SCXML2RosGenerator instance)
+	// Last generated package name (to allow multiple generation using the same
+	// SCXML2RosGenerator instance)
 	private String currentRosPkgName;
 
 	public SCXML2RosGenerator(final String scxmlPath, final String adfPath, final String outputDir) {
 		this(scxmlPath, adfPath, outputDir, ROS_PKG_DEAFULT_NAME);
 	}
-	
-	public SCXML2RosGenerator(final String scxmlPath, final String adfPath, final String outputDir, final String rosPkgName) {
+
+	public SCXML2RosGenerator(final String scxmlPath, final String adfPath, final String outputDir,
+			final String rosPkgName) {
 		final File scxmlFile = new File(scxmlPath);
 		if (!scxmlFile.exists()) {
 			throw new IllegalArgumentException("scxml path must be an existing file");
@@ -70,7 +74,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		engine.setProperty("resource.loader.classpath.class", ClasspathResourceLoader.class.getName());
 		engine.setProperty("parser.space_gobbling", "lines");
 	}
-	
+
 	public void setInitialRosPkgName(final String initialRosPkgName) {
 		this.initialRosPkgName = initialRosPkgName;
 	}
@@ -153,17 +157,28 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		}
 		return Files.exists(path);
 	}
-	
-	protected boolean createROSFunctions(SCXML scxml, JsonArray functionList) {
-		//TODO to be completed
-		for(int i=0; i< functionList.size(); i++) {
-			
+
+	protected boolean createROSFunctions(SCXML scxml) {
+		final Path path = Paths.get(adfPath);
+		boolean success = false;
+		try (BufferedReader adfReader = Files.newBufferedReader(path)) {
+			JsonArray functionList = ADFReader.read(adfReader);
+			for (int i = 0; i < functionList.size(); i++) {
+				success = createROSActionSkeleton();
+				//If operation not succeeded return immediately
+				if(!success) {
+					return success;
+				}
+			}
+		} catch (IOException e) {
+			LOGGER.error("Error:", e);
+			success = false;
 		}
-		return false;
+		return success;
 	}
-	
+
 	private boolean createROSActionSkeleton() {
-		//TODO to be completed
+		// TODO to be completed
 
 		return false;
 	}
@@ -176,7 +191,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	 */
 	@Override
 	public boolean generate() {
-		boolean success = true;
+		boolean success = false;
 
 		// Create new ROS package to contain generated algorithm
 		success = createNewROSPackage();

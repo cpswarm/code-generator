@@ -19,7 +19,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(OrderAnnotation.class)
 class SCXML2RosTests {
 
-	private static final String INPUT_PATH = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
+	private static final String SCXML_PATH = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
+	private static final String ADF_PATH = "/it/links/pert/codegen/scxml/data/uav_ADF.json";
 	private static final String OUTPUT_DIR = "test_tmp/";
 	private static final String REF_FILE_DIR = "/it/links/pert/codegen/scxml/reference/ros/";
 	private static File testDirectory;
@@ -34,7 +35,7 @@ class SCXML2RosTests {
 		}
 		// Initialize @SCXML2RosGenerator instance
 		final Path resourceDirectory = Paths.get("src", "test", "resources");
-		generator = new SCXML2RosGenerator(resourceDirectory + INPUT_PATH, OUTPUT_DIR);
+		generator = new SCXML2RosGenerator(resourceDirectory + SCXML_PATH, resourceDirectory + ADF_PATH, OUTPUT_DIR);
 	}
 
 	@AfterAll
