@@ -1,0 +1,113 @@
+{
+	"runtime-env": "ROS",
+	"sensors/actuators": [
+		{
+			"name": "GPS",
+			"description": "Sensor to provide GPS data",
+			"category": "Sensor",
+			"api": {pos
+				"outputs": [
+					{
+						"topic": "mavros/global_position/global",
+						"msg_def": {
+							"class": "sensor_msgs/NavSatFix",
+							"fields": [
+								{
+									"class": "float64",
+									"name": "latitude"
+								},
+								{
+									"class": "float64",
+									"name": "longitude"
+								},
+								{
+									"class": "float64",
+									"name": "altitude"
+								}
+							]
+						}
+					}
+				]
+			}
+		}
+	],
+	"functions": [
+		{
+			"name": "uav_mavros_takeoff",
+			"description": "Send takeoff command",
+			"category": "abstraction-lib",
+			"api": {
+				"comm_paradigm": "rosaction",
+				"comm_model": {
+					"name": "cmd/takeoff",
+					"class": "TakeOff",
+					"goal": {
+						"fields": [
+							{
+								"class":"float64",
+								"name": "altitude"
+							}
+						]
+					}
+				}
+			}
+		},
+		{
+			"name": "uav_mavros_land",
+			"description": "Send land command",
+			"category": "abstraction-lib",
+			"api": {
+				"comm_paradigm": "rosservice",
+				"comm_model": {
+					"name": "cmd/land",
+					"class": "Empty"
+				}
+			}
+		},
+		{
+			"name": "uav_assign_task",
+			"description": "Assing a task in specific (GPS) position to another CPS based on distance",
+			"category": "swarm-lib",
+			"api": {
+				"comm_paradigm": "rosaction",
+				"comm_model": {
+					"name": "cmd/assign_task",
+					"class": "GlobalAssignTask",
+					"goal": {
+						"fields": [
+							{
+								"class":"uint32",
+								"name": "target_id",
+								"description": "ID of the target"
+							},
+							{
+								"class":"sensor_msgs/NavSatFix",
+								"name": "target_pose",
+								"description": "GPS position of the target"
+							}
+						]
+					},
+					"result": {
+						"fields": [
+							{
+								"class":"uint32",
+								"name": "target_id",
+								"description": "ID of the target"
+							},
+							{
+								"class":"string",
+								"name": "selected_cps_UUID",
+								"description": "UUID of the selected CPS"
+							},
+							{
+								"class":"sensor_msgs/NavSatFix",
+								"name": "target_pose",
+								"description": "GPS position of the target"
+							}
+						]
+					}
+				}
+			}
+		}
+	]
+}

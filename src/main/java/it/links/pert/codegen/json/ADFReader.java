@@ -3,13 +3,13 @@
  */
 package it.links.pert.codegen.json;
 
-import java.io.IOException;
 import java.io.Reader;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+
 
 /**
  * The ADFReader provides the ability to read an Abstraction Description File document.
@@ -27,11 +27,9 @@ public class ADFReader {
 	 * 
 	 * @param reader
 	 * @return
-	 * @throws IOException
-	 * @throws ParseException
 	 */
-	public static JSONArray read(Reader reader) throws IOException, ParseException {
-		JSONArray functionList = readInternal(reader);
+	public static JsonArray read(Reader reader) {
+		JsonArray functionList = readInternal(reader);
 		return functionList;
 	}
 	
@@ -39,13 +37,10 @@ public class ADFReader {
 	 * 
 	 * @param reader
 	 * @return
-	 * @throws IOException
-	 * @throws ParseException
 	 */
-	private static JSONArray readInternal(Reader reader) throws IOException, ParseException {
-		JSONParser parser = new JSONParser();
-		JSONObject jsonObject = (JSONObject) parser.parse(reader);
-		JSONArray functionList = (JSONArray) jsonObject.get("functions");
+	private static JsonArray readInternal(Reader reader) {
+		JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
+		JsonArray functionList = (JsonArray) jsonObject.get("functions");
 		return functionList;
 	}
 }

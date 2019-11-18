@@ -1,7 +1,8 @@
 package it.links.pert.codegen;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import it.links.pert.codegen.generator.CodeGenerator;
 import it.links.pert.codegen.scxml.SCXML2RosGenerator;
 

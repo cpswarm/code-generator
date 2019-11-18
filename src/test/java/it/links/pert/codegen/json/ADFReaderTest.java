@@ -1,42 +1,44 @@
 package it.links.pert.codegen.json;
 
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.commons.io.FileUtils;
-import org.json.simple.JSONArray;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 class ADFReaderTest {
 
-	private static final String INPUT_PATH = "/it/links/pert/codegen/json/data/";
-	private static final String OUTPUT_DIR = "test_tmp/";
-	private static final String REF_FILE_DIR = "/it/links/pert/codegen/json/reference/ros/";
-	private static File testDirectory;
+	private static final String FUNCTION_NAME = "name";
+	private static final String INPUT_PATH = "/it/links/pert/codegen/json/data/uav_ADF_test1.json";
+	private final Path resourceDirectory = Paths.get("src", "test", "resources");
 
-	@BeforeAll
-	static void setUpBeforeClass() throws Exception {
-		// Set up temp directory to put outputs in
-		testDirectory = new File(OUTPUT_DIR);
-		if (!testDirectory.exists()) {
-			testDirectory.mkdir();
-		}
-	}
-
-	@AfterAll
-	static void tearDownAfterClass() throws Exception {
-		FileUtils.deleteDirectory(testDirectory);
-	}
+	private static final Logger LOGGER = LoggerFactory.getLogger(ADFReader.class.getName());
 
 	@Test
-	public void testRead() throws Exception {
-		//TODO to be completed
-		final Reader ADFileReader = Files.newBufferedReader(Paths.get(""));
-		JSONArray functionList = ADFReader.read(ADFileReader);
+	public void testADFRead() throws Exception {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testADFRead test--------------------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+
+		final Reader ADFileReader = Files.newBufferedReader(Paths.get(resourceDirectory + INPUT_PATH));
+		JsonArray functionList = ADFReader.read(ADFileReader);
+		assertEquals(3, functionList.size());
+		JsonObject function0 = (JsonObject) functionList.get(0);
+		assertEquals("uav_mavros_takeoff", function0.get(FUNCTION_NAME).getAsString());
+		JsonObject function1 = (JsonObject) functionList.get(1);
+		assertEquals("uav_mavros_land", function1.get(FUNCTION_NAME).getAsString());
+		JsonObject function2 = (JsonObject) functionList.get(2);
+		assertEquals("uav_assign_task", function2.get(FUNCTION_NAME).getAsString());
+		JsonObject fnc_api = function2.get("api").getAsJsonObject();
+		assertEquals("rosaction", fnc_api.get("comm_paradigm").getAsString());
 	}
 
 }

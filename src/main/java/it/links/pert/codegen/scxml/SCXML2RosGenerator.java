@@ -21,9 +21,10 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.json.simple.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonArray;
 
 import it.links.pert.codegen.generator.CodeGenerator;
 
@@ -127,7 +128,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		return Files.exists(path);
 	}
 	
-	protected boolean createROSFunctions(SCXML scxml, JSONArray functionList) {
+	protected boolean createROSFunctions(SCXML scxml, JsonArray functionList) {
 		//TODO to be completed
 		for(int i=0; i< functionList.size(); i++) {
 			
