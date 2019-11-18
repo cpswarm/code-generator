@@ -40,22 +40,28 @@ public class SCXML2RosGenerator implements CodeGenerator {
 
 	private final VelocityEngine engine;
 	private final String scxmlPath;
+	private final String adfPath;
 	private final String outputDir;
 	//Initial name for new generated ROS packages
 	private String initialRosPkgName;
 	//Last generated package name (to allow multiple generation using the same SCXML2RosGenerator instance)
 	private String currentRosPkgName;
 
-	public SCXML2RosGenerator(final String scxmlPath, final String outputDir) {
-		this(scxmlPath, outputDir, ROS_PKG_DEAFULT_NAME);
+	public SCXML2RosGenerator(final String scxmlPath, final String adfPath, final String outputDir) {
+		this(scxmlPath, adfPath, outputDir, ROS_PKG_DEAFULT_NAME);
 	}
 	
-	public SCXML2RosGenerator(final String scxmlPath, final String outputDir, final String rosPkgName) {
+	public SCXML2RosGenerator(final String scxmlPath, final String adfPath, final String outputDir, final String rosPkgName) {
 		final File scxmlFile = new File(scxmlPath);
 		if (!scxmlFile.exists()) {
 			throw new IllegalArgumentException("scxml path must be an existing file");
 		}
+		final File adfFile = new File(adfPath);
+		if (!adfFile.exists()) {
+			throw new IllegalArgumentException("adf path must be an existing file");
+		}
 		this.scxmlPath = scxmlPath;
+		this.adfPath = adfPath;
 		this.outputDir = outputDir;
 		this.initialRosPkgName = rosPkgName;
 		this.currentRosPkgName = rosPkgName;
