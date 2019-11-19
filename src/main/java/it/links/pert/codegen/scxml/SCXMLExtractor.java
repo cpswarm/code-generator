@@ -42,7 +42,10 @@ public class SCXMLExtractor {
 		NodeList stateList = getElementsByTagNameInternal(scxmlStream, STATE_TAG);
 		for (int i = 0; i < stateList.getLength(); i++) {
 			Element state = (Element) stateList.item(i);
-			// Get data associated with this node
+			/*
+			 * Get data associated with this node NB: if a state is contained into another
+			 * state the same Data tag can be extracted multiple times
+			 */
 			NodeList dataList = state.getElementsByTagName(DATA_TAG);
 			for (int j = 0; j < dataList.getLength(); j++) {
 				Element data = (Element) dataList.item(j);
@@ -52,6 +55,7 @@ public class SCXMLExtractor {
 					// Extract function name from "data" tag
 					Element nameTag = (Element) data.getElementsByTagName(FUNCTION_NAME_TAG).item(0);
 					String name = nameTag.getFirstChild().getNodeValue();
+					// Check if this function has not been already extracted
 					if (!functionNames.contains(name)) {
 						functionNames.add(name);
 					}

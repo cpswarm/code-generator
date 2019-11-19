@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.scxml2.io.SCXMLReader;
@@ -24,6 +25,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.google.gson.JsonArray;
 
@@ -35,6 +37,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SCXML2RosGenerator.class.getName());
 
 	protected final static String FSM_TEMPLATE_FILE = "template/ros/state_machine.vm";
+	protected final static String ACTION_SKELETON_TEMPLATE_FILE = "template/ros/action_skeleton.vm";
 	protected final static String PACKAGE_XML_TEMPLATE_FILE = "template/ros/package_xml.vm";
 	protected final static String CMAKELISTS_TEMPLATE_FILE = "template/ros/cmakelists.vm";
 	protected final static String SMACH_FILE_NAME = "behaviour.py";
@@ -93,15 +96,17 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	 * @return true if the package is correctly created
 	 */
 	protected boolean createNewROSPackage() {
-		return mkROSPackageDirs() && createPackageXML() && createCMakeLists();
+		return makeROSPackageDirs() && createPackageXML() && createCMakeLists();
 	}
+
+	// ************************************************************************//
 
 	/**
 	 * Create a new ROS package directory structure
 	 * 
 	 * @return true if the package is correctly created
 	 */
-	private boolean mkROSPackageDirs() {
+	private boolean makeROSPackageDirs() {
 		LOGGER.info("Creating ROS package directories");
 		File newDirectory = new File(outputDir + initialRosPkgName);
 		int count = 1;
@@ -113,9 +118,11 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			newDirectory = new File(tmpDir);
 		}
 		final File scriptsDirectory = new File(newDirectory, "scripts");
+		final File srcDirectory = new File(newDirectory, "src");
 		final File launchDirectory = new File(newDirectory, "launch");
 		final File paramDirectory = new File(newDirectory, "param");
-		return scriptsDirectory.mkdirs() && launchDirectory.mkdir() && paramDirectory.mkdir() && newDirectory.exists();
+		return scriptsDirectory.mkdirs() && srcDirectory.mkdir() && launchDirectory.mkdir() && paramDirectory.mkdir()
+				&& newDirectory.exists();
 	}
 
 	/**
@@ -158,18 +165,57 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		return Files.exists(path);
 	}
 
-	protected boolean createROSFunctions(SCXML scxml) {
-		final Path path = Paths.get(adfPath);
+	// ************************************************************************//
+	/*
+	 * Generate ROS functions skeleton
+	 * Functions to be generated are extracted from SCXML file
+	 * Data to generate function code are extracted from ADF json file
+	 */
+	protected boolean createROSFunctions() {
 		boolean success = false;
-		try (BufferedReader adfReader = Files.newBufferedReader(path)) {
-			JsonArray functionList = ADFReader.read(adfReader);
-			for (int i = 0; i < functionList.size(); i++) {
-				success = createROSActionSkeleton();
-				//If operation not succeeded return immediately
-				if(!success) {
-					return success;
+
+		try (InputStream scxmlStream = Files.newInputStream(Paths.get(scxmlPath))) {
+			// Get function names from SCXML file
+			final List<String> functionNames = SCXMLExtractor.getFunctionsToBeGenerated(scxmlStream);
+			if (!functionNames.isEmpty()) {
+				try (BufferedReader adfReader = Files.newBufferedReader(Paths.get(adfPath))) {
+					// Get functions description from ADF file
+					final JsonArray descriptionList = ADFReader.read(adfReader);
+					for (final String name : functionNames) {
+						// Generate function skeleton
+						if (!createROSActionSkeleton(name, descriptionList)) {
+							// If operation FAILS return immediately
+							throw new RosFunctionGenerationException("ROS function generation errror");
+						}
+					}
 				}
 			}
+			success = true;
+		} catch (IOException | SAXException | ParserConfigurationException | RosFunctionGenerationException e) {
+			LOGGER.error("Error:", e);
+			success = false;
+		}
+
+		return success;
+	}
+
+	private boolean createROSActionSkeleton(final String functionName, final JsonArray descriptionList) {
+		LOGGER.info("Generating ROS Action Skeleton...");
+		boolean success = false;
+		// TODO to be completed
+		final VelocityContext context = new VelocityContext();
+		context.put("name", functionName);
+		context.put("descriptionList", descriptionList);
+		/*
+		 * make a writer, and merge the template 'against' the context
+		 */
+		final String path = outputDir + currentRosPkgName + "/src/" + functionName + ".cpp";
+		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));) {
+			final Template template = engine.getTemplate(ACTION_SKELETON_TEMPLATE_FILE);
+			template.merge(context, writer);
+			LOGGER.info("Writing ROS function in: " + path);
+			writer.flush();
+			success = true;
 		} catch (IOException e) {
 			LOGGER.error("Error:", e);
 			success = false;
@@ -177,10 +223,47 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		return success;
 	}
 
-	private boolean createROSActionSkeleton() {
-		// TODO to be completed
+	// ************************************************************************//
+	/*
+	 * Generate SMACH FSM (python)
+	 * Data to generate the code are extracted from SCXML file
+	 */
+	protected boolean generateFSMBehavior() {
+		LOGGER.info("Generating FSM behavior...");
+		boolean success = false;
 
-		return false;
+		// Create a list of custom actions, add as many as are needed
+		final List<CustomAction> customActions = new ArrayList<>();
+		// CustomAction ca = new
+		// CustomAction("http://my.custom-actions.domain/cpswarm/CUSTOM", "input",
+		// Input.class);
+		// customActions.add(ca);
+		try (InputStream inputFile = Files.newInputStream(Paths.get(scxmlPath))) {
+			LOGGER.info("Loading state machine...");
+			LOGGER.info("path: " + scxmlPath);
+			SCXML scxml;
+			scxml = SCXMLReader.read(inputFile, new SCXMLReader.Configuration(null, null, customActions));
+			/*
+			 * Make a Context object and populate it.
+			 */
+			final VelocityContext context = new VelocityContext();
+			context.put("scxml", scxml);
+			/*
+			 * make a writer, and merge the template 'against' the context
+			 */
+			final String path = outputDir + currentRosPkgName + "/scripts/" + SMACH_FILE_NAME;
+			try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));) {
+				final Template template = engine.getTemplate(FSM_TEMPLATE_FILE);
+				template.merge(context, writer);
+				LOGGER.info("Writing FSM code in: " + path);
+				writer.flush();
+				success = true;
+			}
+		} catch (IOException | ModelException | XMLStreamException e) {
+			LOGGER.error("Error:", e);
+			success = false;
+		}
+		return success;
 	}
 
 	/**
@@ -191,42 +274,8 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	 */
 	@Override
 	public boolean generate() {
-		boolean success = false;
-
-		// Create new ROS package to contain generated algorithm
-		success = createNewROSPackage();
-		if (success) {
-			// Create a list of custom actions, add as many as are needed
-			final List<CustomAction> customActions = new ArrayList<>();
-			// CustomAction ca = new
-			// CustomAction("http://my.custom-actions.domain/cpswarm/CUSTOM", "input",
-			// Input.class);
-			// customActions.add(ca);
-			try (InputStream inputFile = Files.newInputStream(Paths.get(scxmlPath));) {
-				LOGGER.info("Loading state machine...");
-				LOGGER.info("path: " + scxmlPath);
-				SCXML scxml;
-				scxml = SCXMLReader.read(inputFile, new SCXMLReader.Configuration(null, null, customActions));
-				/*
-				 * Make a Context object and populate it.
-				 */
-				final VelocityContext context = new VelocityContext();
-				context.put("scxml", scxml);
-				/*
-				 * make a writer, and merge the template 'against' the context
-				 */
-				final String path = outputDir + currentRosPkgName + "/scripts/" + SMACH_FILE_NAME;
-				try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));) {
-					final Template template = engine.getTemplate(FSM_TEMPLATE_FILE);
-					template.merge(context, writer);
-					LOGGER.info("Writing code in: " + path);
-					writer.flush();
-				}
-			} catch (IOException | ModelException | XMLStreamException e) {
-				LOGGER.error("Error:", e);
-				success = false;
-			}
-		}
+		boolean success;
+		success = createNewROSPackage() && createROSFunctions() && generateFSMBehavior();
 		return success;
 	}
 }

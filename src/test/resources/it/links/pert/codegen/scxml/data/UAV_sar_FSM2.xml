@@ -32,6 +32,9 @@
 			<!-- ****************TAKEOFF ******************** -->
 			<state id="TakeOff">
 				<datamodel>
+					<data id="adf">
+						<name>uav_mavros_takeoff</name>
+					</data>
 					<data id="invoke">
 						<rosaction>
 							<name>cmd/takeoff</name>
@@ -54,7 +57,7 @@
 						<rosaction>
 							<name>uav_coverage</name>
 							<action>Coverage</action>
-							<goal type="empty"/>
+							<goal type="empty" />
 						</rosaction>
 					</data>
 				</datamodel>
@@ -111,7 +114,7 @@
 						<rosaction>
 							<name>uav_local_coverage</name>
 							<action>Coverage</action>
-							<goal type="empty"/>
+							<goal type="empty" />
 						</rosaction>
 					</data>
 				</datamodel>
@@ -149,7 +152,7 @@
 					<rosservice>
 						<name>cmd/land</name>
 						<srv>std_srvs.srv.Empty</srv>
-						<request type="empty"/>
+						<request type="empty" />
 					</rosservice>
 				</data>
 			</datamodel>

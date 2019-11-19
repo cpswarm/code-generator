@@ -15,16 +15,20 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @TestMethodOrder(OrderAnnotation.class)
 class SCXML2RosTests {
 
 	private static final String SCXML_PATH = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
-	private static final String ADF_PATH = "/it/links/pert/codegen/scxml/data/uav_ADF.json";
+	private static final String ADF_PATH = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
 	private static final String OUTPUT_DIR = "test_tmp/";
 	private static final String REF_FILE_DIR = "/it/links/pert/codegen/scxml/reference/ros/";
 	private static File testDirectory;
 	private static SCXML2RosGenerator generator;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(SCXML2RosTests.class.getName());
 
 	@BeforeAll
 	static void setUp() {
@@ -53,12 +57,18 @@ class SCXML2RosTests {
 	@Test
 	@Order(1)
 	public void testCreateROSPackage() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testCreateROSPackage test-----------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
 		assertTrue(generator.createNewROSPackage());
 	}
 
 	@Test
 	@Order(2)
 	public void testCreateROSPackageWithExistingDir() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testCreateROSPackageWithExistingDir test--------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
 		assertTrue(generator.createNewROSPackage());
 		final File beahaviorPkg = new File(OUTPUT_DIR + generator.getLastGeneratedPkgName());
 		if (beahaviorPkg.exists())
@@ -70,13 +80,28 @@ class SCXML2RosTests {
 
 	@Test
 	@Order(3)
-	public void testGenerate() {
-		assertTrue(generator.generate());
+	public void testcreateROSFunctions() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testcreateROSFunctions test---------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		assertTrue(generator.createROSFunctions());
 	}
 
 	@Test
 	@Order(4)
+	public void testGenerate() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testGenerate test-------------------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		assertTrue(generator.generate());
+	}
+
+	@Test
+	@Order(5)
 	public void validateGeneratedFiles() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting validateGeneratedFiles test---------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
 		generator.generate();
 
 		final String base_dir_path = OUTPUT_DIR + generator.getLastGeneratedPkgName();
@@ -102,6 +127,14 @@ class SCXML2RosTests {
 		final File packageXMLFile_ref = new File(resourceDirectory + REF_FILE_DIR + "target_package.xml");
 		try {
 			assertTrue(FileUtils.contentEquals(packageXMLFile_ref, packageXMLFile));
+		} catch (IOException e) {
+			fail("package.xml files should be available");
+		}
+		// Test generated package.xml against reference file
+		final File rosFncFile = new File(base_dir_path + "/src/" + "uav_mavros_takeoff.cpp");
+		final File rosFncFile_ref = new File(resourceDirectory + REF_FILE_DIR + "target_takeoff.cpp");
+		try {
+			assertTrue(FileUtils.contentEquals(rosFncFile_ref, rosFncFile));
 		} catch (IOException e) {
 			fail("package.xml files should be available");
 		}
