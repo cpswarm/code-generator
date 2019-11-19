@@ -52,7 +52,9 @@ public class SCXMLExtractor {
 					// Extract function name from "data" tag
 					Element nameTag = (Element) data.getElementsByTagName(FUNCTION_NAME_TAG).item(0);
 					String name = nameTag.getFirstChild().getNodeValue();
-					functionNames.add(name);
+					if (!functionNames.contains(name)) {
+						functionNames.add(name);
+					}
 				}
 			}
 		}
