@@ -144,11 +144,21 @@ ${indent}# ADD ${state.id} to#if(${state.getParent()}) ${state.getParent().id}#e
 ${indent}smach.StateMachine.add('${state.id}',
 	#if(!$state.invokes.empty)
 		#if($state.invokes[0].type == "ROS_SERVICE")
-			#set($service_content = $state.getDatamodel().getData().get(0).getParsedValue().getValue().getChildNodes())
+			#foreach($data in $state.getDatamodel().getData())
+				#if($data.getId() == "invoke")
+					#set($service_content = $data.getParsedValue().getValue().getChildNodes())
+					#break
+				#end
+			#end
 			#set($continue=true)
 			#parse("template/ros/atomic/ROS_service_state.vm")
 		#elseif($state.invokes[0].type == "ROS_ACTION")
-			#set($action_content = $state.getDatamodel().getData().get(0).getParsedValue().getValue().getChildNodes())
+			#foreach($data in $state.getDatamodel().getData())
+				#if($data.getId() == "invoke")
+					#set($action_content = $data.getParsedValue().getValue().getChildNodes())
+					#break
+				#end
+			#end
 			#set($continue=true)
 			#parse("template/ros/atomic/ROS_action_state.vm")
 		#else
@@ -188,15 +198,30 @@ ${indent}# ADD ${state.id} to#if(${state.getParent()}) ${state.getParent().id}#e
 ${indent}smach.Concurrence.add('${state.id}',
 	#if(!$state.invokes.empty)
 		#if($state.invokes[0].type == "ROS_SERVICE")
-			#set($service_content = $state.getDatamodel().getData().get(0).getParsedValue().getValue().getChildNodes())
+			#foreach($data in $state.getDatamodel().getData())
+				#if($data.getId() == "invoke")
+					#set($service_content = $data.getParsedValue().getValue().getChildNodes())
+					#break
+				#end
+			#end
 			#set($continue=false)
 			#parse("template/ros/atomic/ROS_service_state.vm"))
 		#elseif($state.invokes[0].type == "ROS_ACTION")
-			#set($action_content = $state.getDatamodel().getData().get(0).getParsedValue().getValue().getChildNodes())
+			#foreach($data in $state.getDatamodel().getData())
+				#if($data.getId() == "invoke")
+					#set($action_content = $data.getParsedValue().getValue().getChildNodes())
+					#break
+				#end
+			#end
 			#set($continue=false)
 			#parse("template/ros/atomic/ROS_action_state.vm"))
 		#elseif($state.invokes[0].type == "ROS_MONITOR")
-			#set($monitor_content = $state.getDatamodel().getData().get(0).getParsedValue().getValue().getChildNodes())
+			#foreach($data in $state.getDatamodel().getData())
+				#if($data.getId() == "invoke")
+					#set($monitor_content = $data.getParsedValue().getValue().getChildNodes())
+					#break
+				#end
+			#end
 			#set($continue=false)
 			#parse("template/ros/atomic/ROS_monitor_state.vm"))
 		#else
