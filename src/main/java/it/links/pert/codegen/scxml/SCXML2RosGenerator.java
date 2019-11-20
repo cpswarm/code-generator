@@ -1,6 +1,5 @@
 package it.links.pert.codegen.scxml;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -27,10 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import com.google.gson.JsonArray;
-
 import it.links.pert.codegen.generator.CodeGenerator;
-import it.links.pert.codegen.json.ADFReader;
+import it.links.pert.codegen.json.RosADFReader;
+import it.links.pert.codegen.model.ros.RosADF;
+import it.links.pert.codegen.model.ros.RosFunction;
 
 public class SCXML2RosGenerator implements CodeGenerator {
 
@@ -167,9 +166,8 @@ public class SCXML2RosGenerator implements CodeGenerator {
 
 	// ************************************************************************//
 	/*
-	 * Generate ROS functions skeleton
-	 * Functions to be generated are extracted from SCXML file
-	 * Data to generate function code are extracted from ADF json file
+	 * Generate ROS functions skeleton Functions to be generated are extracted from
+	 * SCXML file Data to generate function code are extracted from ADF json file
 	 */
 	protected boolean createROSFunctions() {
 		boolean success = false;
@@ -178,15 +176,14 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			// Get function names from SCXML file
 			final List<String> functionNames = SCXMLExtractor.getFunctionsToBeGenerated(scxmlStream);
 			if (!functionNames.isEmpty()) {
-				try (BufferedReader adfReader = Files.newBufferedReader(Paths.get(adfPath))) {
-					// Get functions description from ADF file
-					final JsonArray descriptionList = ADFReader.read(adfReader);
-					for (final String name : functionNames) {
-						// Generate function skeleton
-						if (!createROSActionSkeleton(name, descriptionList)) {
-							// If operation FAILS return immediately
-							throw new RosFunctionGenerationException("ROS function generation errror");
-						}
+				RosADFReader adfReader = new RosADFReader();
+				final RosADF adf = adfReader.read(new File(adfPath));
+				List<RosFunction> rosFunctions = adf.getFunctions();
+				for (final String name : functionNames) {
+					// Generate function skeleton
+					if (!createROSActionSkeleton(name, rosFunctions)) {
+						// If operation FAILS return immediately
+						throw new RosFunctionGenerationException("ROS function generation errror");
 					}
 				}
 			}
@@ -199,7 +196,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		return success;
 	}
 
-	private boolean createROSActionSkeleton(final String functionName, final JsonArray descriptionList) {
+	private boolean createROSActionSkeleton(final String functionName, final List<RosFunction> descriptionList) {
 		LOGGER.info("Generating ROS Action Skeleton...");
 		boolean success = false;
 		// TODO to be completed
@@ -225,8 +222,8 @@ public class SCXML2RosGenerator implements CodeGenerator {
 
 	// ************************************************************************//
 	/*
-	 * Generate SMACH FSM (python)
-	 * Data to generate the code are extracted from SCXML file
+	 * Generate SMACH FSM (python) Data to generate the code are extracted from
+	 * SCXML file
 	 */
 	protected boolean generateFSMBehavior() {
 		LOGGER.info("Generating FSM behavior...");

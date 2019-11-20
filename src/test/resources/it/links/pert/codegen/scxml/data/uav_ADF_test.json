@@ -1,113 +1,272 @@
 {
-	"runtime-env": "ROS",
-	"sensors/actuators": [
-		{
-			"name": "GPS",
-			"description": "Sensor to provide GPS data",
-			"category": "Sensor",
-			"api": {
-				"outputs": [
-					{
-						"topic": "mavros/global_position/global",
-						"msg_def": {
-							"class": "sensor_msgs/NavSatFix",
-							"fields": [
-								{
-									"class": "float64",
-									"name": "latitude"
-								},
-								{
-									"class": "float64",
-									"name": "longitude"
-								},
-								{
-									"class": "float64",
-									"name": "altitude"
-								}
-							]
-						}
-					}
-				]
-			}
-		}
-	],
-	"functions": [
-		{
-			"name": "uav_mavros_takeoff",
-			"description": "Send takeoff command",
-			"category": "abstraction-lib",
-			"api": {
-				"comm_paradigm": "rosaction",
-				"comm_model": {
-					"name": "cmd/takeoff",
-					"class": "TakeOff",
-					"goal": {
-						"fields": [
-							{
-								"class":"float64",
-								"name": "altitude"
-							}
-						]
-					}
-				}
-			}
-		},
-		{
-			"name": "uav_mavros_land",
-			"description": "Send land command",
-			"category": "abstraction-lib",
-			"api": {
-				"comm_paradigm": "rosservice",
-				"comm_model": {
-					"name": "cmd/land",
-					"class": "Empty"
-				}
-			}
-		},
-		{
-			"name": "uav_assign_task",
-			"description": "Assing a task in specific (GPS) position to another CPS based on distance",
-			"category": "swarm-lib",
-			"api": {
-				"comm_paradigm": "rosaction",
-				"comm_model": {
-					"name": "cmd/assign_task",
-					"class": "GlobalAssignTask",
-					"goal": {
-						"fields": [
-							{
-								"class":"uint32",
-								"name": "target_id",
-								"description": "ID of the target"
-							},
-							{
-								"class":"sensor_msgs/NavSatFix",
-								"name": "target_pose",
-								"description": "GPS position of the target"
-							}
-						]
-					},
-					"result": {
-						"fields": [
-							{
-								"class":"uint32",
-								"name": "target_id",
-								"description": "ID of the target"
-							},
-							{
-								"class":"string",
-								"name": "selected_cps_UUID",
-								"description": "UUID of the selected CPS"
-							},
-							{
-								"class":"sensor_msgs/NavSatFix",
-								"name": "target_pose",
-								"description": "GPS position of the target"
-							}
-						]
-					}
-				}
-			}
-		}
-	]
+  "runtime-env": "ROS",
+  "functions": [
+    {
+      "name": "uav_mavros_takeoff",
+      "description": "Send takeoff command",
+      "category": "abstraction-lib",
+      "param_list": [
+        {
+          "class": "number",
+          "name": "pos_tolerance",
+          "value": 0.1
+        },
+        {
+          "class": "number",
+          "name": "frequency",
+          "value": 10.0
+        },
+        {
+          "class": "number",
+          "name": "stabilize_time",
+          "value": 5
+        },
+        {
+          "class": "number",
+          "name": "takeoff_steps",
+          "value": 1
+        },
+        {
+          "class": "number",
+          "name": "initial_yaw",
+          "value": 90
+        }
+      ],
+      "api": {
+        "inputs": [
+          {
+            "topic": "mavros/state",
+            "msg_def": {
+              "class": "mavros_msgs/State",
+              "fields": [
+                {
+                  "class": "stds_msgs/Header",
+                  "name": "header",
+                  "description": "ros header"
+                },
+                {
+                  "class": "bool",
+                  "name": "connected"
+                },
+                {
+                  "class": "bool",
+                  "name": "armed"
+                },
+                {
+                  "class": "bool",
+                  "name": "guided"
+                },
+                {
+                  "class": "bool",
+                  "name": "manual_input"
+                },
+                {
+                  "class": "string",
+                  "name": "mode"
+                },
+                {
+                  "class": "uint8",
+                  "name": "system_status"
+                }
+              ]
+            }
+          },
+          {
+            "topic": "pos_provider",
+            "msg_def": {
+              "class": "geometry_msgs/PoseStamped",
+              "fields": [
+                {
+                  "class": "stds_msgs/Header",
+                  "name": "header",
+                  "description": "ros header"
+                },
+                {
+                  "class": "geometry_msgs/Pose",
+                  "name": "pose"
+                }
+              ]
+            }
+          },
+          {
+            "topic": "mavros/state",
+            "msg_def": {
+              "class": "geometry_msgs/PoseStamped",
+              "fields": [
+                {
+                  "class": "stds_msgs/Header",
+                  "name": "header",
+                  "description": "ros header"
+                },
+                {
+                  "class": "geometry_msgs/Pose",
+                  "name": "pose"
+                }
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "topic": "pos_controller/goal_position",
+            "msg_def": {
+              "class": "geometry_msgs/PoseStamped",
+              "fields": [
+                {
+                  "class": "stds_msgs/Header",
+                  "name": "header",
+                  "description": "ros header"
+                },
+                {
+                  "class": "geometry_msgs/Pose",
+                  "name": "pose"
+                }
+              ]
+            }
+          }
+        ],
+        "comm_model": {
+          "paradigm": "rosaction",
+          "definition": {
+            "name": "cmd/takeoff",
+            "class": "TakeOff",
+            "goal": {
+              "fields": [
+                {
+                  "class": "float64",
+                  "name": "altitude"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "uav_mavros_land",
+      "description": "Send land command",
+      "category": "abstraction-lib",
+      "api": {
+        "comm_model": {
+          "paradigm": "rosservice",
+          "definition": {
+            "name": "cmd/land",
+            "class": "Empty"
+          }
+        }
+      }
+    },
+    {
+      "name": "auction_action",
+      "description": "Assing a task in a specific position to another CPS",
+      "category": "swarm-lib",
+      "api": {
+        "inputs": [
+          {
+            "topic": "bridge/events/cps_selection",
+            "msg_def": {
+              "class": "cpswarm_msgs/TaskAllocationEvent",
+              "fields": [
+                {
+                  "class": "stds_msgs/Header",
+                  "name": "header",
+                  "description": "ros header"
+                },
+                {
+                  "class": "swarmros/EventHeader",
+                  "name": "swarmio",
+                  "description": "cpswarm swarmio swarmros header"
+                },
+                {
+                  "class": "int32",
+                  "name": "task_id",
+                  "description": "id of the task"
+                },
+                {
+                  "class": "float64",
+                  "name": "bid",
+                  "description": "bid of the cps for the task (inverse of cost)"
+                }
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "topic": "cps_selected",
+            "msg_def": {
+              "class": "cpswarm_msgs/TaskAllocatedEvent",
+              "fields": [
+                {
+                  "class": "stds_msgs/Header",
+                  "name": "header",
+                  "description": "ros header"
+                },
+                {
+                  "class": "swarmros/EventHeader",
+                  "name": "swarmio",
+                  "description": "cpswarm swarmio swarmros header"
+                },
+                {
+                  "class": "int32",
+                  "name": "task_id",
+                  "description": "id of the task"
+                },
+                {
+                  "class": "string",
+                  "name": "cps_id",
+                  "description": "uuid of the cps to which the task has been allocated"
+                }
+              ]
+            }
+          }
+        ],
+        "comm_model": {
+          "paradigm": "rosaction",
+          "definition": {
+            "name": "cmd/task_allocation_auction",
+            "class": "cpswarm_msgs/TaskAllocation",
+            "goal": {
+              "fields": [
+                {
+                  "class": "string",
+                  "name": "auctioneer",
+                  "description": "UUID of the CPS performing the task allocation"
+                },
+                {
+                  "class": "uint32",
+                  "name": "task_id",
+                  "description": "ID of the task"
+                },
+                {
+                  "class": "geometry_msgs/PoseStamped",
+                  "name": "task_pose",
+                  "description": "Local position of the task"
+                }
+              ]
+            },
+            "result": {
+              "fields": [
+                {
+                  "class": "string",
+                  "name": "winner",
+                  "description": "UUID of the CPS to which the task is allocated"
+                },
+                {
+                  "class": "uint32",
+                  "name": "task_id",
+                  "description": "ID of the task"
+                },
+                {
+                  "class": "geometry_msgs/PoseStamped",
+                  "name": "task_pose",
+                  "description": "Local position of the task"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
 }
