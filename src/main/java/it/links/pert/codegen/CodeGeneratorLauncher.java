@@ -6,14 +6,14 @@ import org.slf4j.LoggerFactory;
 import it.links.pert.codegen.generator.CodeGenerator;
 import it.links.pert.codegen.scxml.SCXML2RosGenerator;
 
-public final class CodeGeneratorApp {
+public final class CodeGeneratorLauncher {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CodeGeneratorApp.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(CodeGeneratorLauncher.class.getName());
 
 	/*
 	 * Private constructor
 	 */
-	private CodeGeneratorApp() {
+	private CodeGeneratorLauncher() {
 	}
 
 	public static void main(String[] args) {
