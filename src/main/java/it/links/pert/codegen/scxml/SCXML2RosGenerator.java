@@ -133,7 +133,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		LOGGER.info("Creating package.xml");
 		final Template template = engine.getTemplate(PACKAGE_XML_TEMPLATE_FILE);
 		final VelocityContext context = new VelocityContext();
-		context.put("packageName", ROS_PKG_DEAFULT_NAME);
+		context.put("packageName", currentRosPkgName);
 		final Path path = Paths.get(outputDir + currentRosPkgName + "/package.xml");
 		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
 			template.merge(context, writer);
@@ -153,7 +153,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		LOGGER.info("Creating CMakeLists.txt");
 		final Template template = engine.getTemplate(CMAKELISTS_TEMPLATE_FILE);
 		final VelocityContext context = new VelocityContext();
-		context.put("packageName", ROS_PKG_DEAFULT_NAME);
+		context.put("packageName", currentRosPkgName);
 		final Path path = Paths.get(outputDir + currentRosPkgName + "/CMakeLists.txt");
 		try (BufferedWriter writer = Files.newBufferedWriter(path)) {
 			template.merge(context, writer);
@@ -205,10 +205,9 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	private boolean createROSActionSkeleton(final RosFunction fncDescription) {
 		LOGGER.info("Generating ROS Action Skeleton...");
 		boolean success = false;
-		// TODO to be completed
+
 		final VelocityContext context = new VelocityContext();
 		context.put("fncDescription", fncDescription);
-//		context.put("comm_model", fncDescription.getApi().);
 		/*
 		 * make a writer, and merge the template 'against' the context
 		 */

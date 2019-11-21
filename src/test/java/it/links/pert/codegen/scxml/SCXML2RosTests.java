@@ -21,13 +21,11 @@ import org.slf4j.LoggerFactory;
 @TestMethodOrder(OrderAnnotation.class)
 class SCXML2RosTests {
 
-	private static final String SCXML_PATH = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
-	private static final String ADF_PATH = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
 	private static final String OUTPUT_DIR = "test_tmp/";
 	private static final String REF_FILE_DIR = "/it/links/pert/codegen/scxml/reference/ros/";
+	private static final Path resourceDirectory = Paths.get("src", "test", "resources");
 	private static File testDirectory;
-	private static SCXML2RosGenerator generator;
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(SCXML2RosTests.class.getName());
 
 	@BeforeAll
@@ -38,8 +36,6 @@ class SCXML2RosTests {
 			testDirectory.mkdir();
 		}
 		// Initialize @SCXML2RosGenerator instance
-		final Path resourceDirectory = Paths.get("src", "test", "resources");
-		generator = new SCXML2RosGenerator(resourceDirectory + SCXML_PATH, resourceDirectory + ADF_PATH, OUTPUT_DIR);
 	}
 
 	@AfterAll
@@ -60,6 +56,10 @@ class SCXML2RosTests {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting testCreateROSPackage test-----------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final String scxmlPath = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
+		final String adfPath = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
+		final SCXML2RosGenerator generator = new SCXML2RosGenerator(resourceDirectory + scxmlPath,
+				resourceDirectory + adfPath, OUTPUT_DIR, "createROSpkg");
 		assertTrue(generator.createNewROSPackage());
 	}
 
@@ -69,6 +69,10 @@ class SCXML2RosTests {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting testCreateROSPackageWithExistingDir test--------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final String scxmlPath = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
+		final String adfPath = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
+		final SCXML2RosGenerator generator = new SCXML2RosGenerator(resourceDirectory + scxmlPath,
+				resourceDirectory + adfPath, OUTPUT_DIR, "existing_pkg");
 		assertTrue(generator.createNewROSPackage());
 		final File beahaviorPkg = new File(OUTPUT_DIR + generator.getLastGeneratedPkgName());
 		if (beahaviorPkg.exists())
@@ -80,10 +84,15 @@ class SCXML2RosTests {
 
 	@Test
 	@Order(3)
-	public void testcreateROSFunctions() {
+	public void testcreateROSFunctions1() {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting testcreateROSFunctions test---------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final String scxmlPath = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
+		final String adfPath = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
+		final SCXML2RosGenerator generator = new SCXML2RosGenerator(resourceDirectory + scxmlPath,
+				resourceDirectory + adfPath, OUTPUT_DIR, "rosFunction1");
+		assertTrue(generator.createNewROSPackage());
 		assertTrue(generator.createROSFunctions());
 	}
 
@@ -93,6 +102,10 @@ class SCXML2RosTests {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting testGenerate test-------------------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final String scxmlPath = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
+		final String adfPath = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
+		final SCXML2RosGenerator generator = new SCXML2RosGenerator(resourceDirectory + scxmlPath,
+				resourceDirectory + adfPath, OUTPUT_DIR, "fsm_generate");
 		assertTrue(generator.generate());
 	}
 
@@ -102,6 +115,10 @@ class SCXML2RosTests {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting validateGeneratedFiles test---------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final String scxmlPath = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
+		final String adfPath = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
+		final SCXML2RosGenerator generator = new SCXML2RosGenerator(resourceDirectory + scxmlPath,
+				resourceDirectory + adfPath, OUTPUT_DIR);
 		generator.generate();
 
 		final String base_dir_path = OUTPUT_DIR + generator.getLastGeneratedPkgName();
