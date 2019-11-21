@@ -4,11 +4,11 @@
 \#include <${class}.h>
 #end
 #set($goalClass = ${fncDescription.api.commModel.definition.class_})
-\#include <${fncDescription.name}/${goalClass}Action.h>
+\#include <${goalClass}Action.h>
 
 using namespace std;
 
-typedef actionlib::SimpleActionServer<${fncDescription.name}::${goalClass}Action> Server;
+typedef actionlib::SimpleActionServer<${goalClass.replace("/", "::")}Action> Server;
 
 // Variables
 #foreach($output in $fncDescription.api.outputs)
@@ -26,8 +26,10 @@ void ${input.topic.replace("/", "_")}_cb(const ${input.msg.class_.replace("/", "
 }
 
 #end
-bool execute_cb(const ${fncDescription.name}::${goalClass}Goal::ConstPtr &goal, Server *as) {
-	ROS_DEBUG("${goalClass.toUpperCase()} - Executing ${goalClass} action..");
+bool execute_cb(const ${goalClass.replace("/", "::")}Goal::ConstPtr &goal, Server *as) {
+	#set($start = $goalClass.indexOf('/') + 1)
+	#set($end = $goalClass.length())
+	ROS_DEBUG("${goalClass.substring($start, $end).toUpperCase()} - Executing action..");
 }
 
 //*******************************************************************************************************************

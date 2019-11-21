@@ -56,7 +56,6 @@ public final class CodeGeneratorLauncher {
 		}
 
 		CodeGenerator generator = null;
-
 		switch (runtimeEnv) {
 		case "ROS":
 			generator = new SCXML2RosGenerator(scxmlPath, adfPath, outputDir);
@@ -65,9 +64,8 @@ public final class CodeGeneratorLauncher {
 			generator = new SCXML2RosGenerator(scxmlPath, adfPath, outputDir);
 		}
 
-		// URL url = App.class.getClassLoader().getResource(stateMachineFile);
 		if (generator.generate()) {
-			LOGGER.info("Code generated with success!!");
+			LOGGER.info("Code generated with SUCCESS!!");
 		} else {
 			LOGGER.info("An error occured during code generation");
 		}

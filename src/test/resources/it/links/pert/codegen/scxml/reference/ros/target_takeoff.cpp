@@ -23,7 +23,7 @@ void pos_provider_cb(const geometry_msgs::PoseStamped::ConstPtr &msg) {
 }
 
 bool execute_cb(const uav_mavros_takeoff::TakeOffGoal::ConstPtr &goal, Server *as) {
-	ROS_DEBUG("TAKEOFF - Executing TakeOff action..");
+	ROS_DEBUG("TAKEOFF - Executing action..");
 }
 
 //*******************************************************************************************************************

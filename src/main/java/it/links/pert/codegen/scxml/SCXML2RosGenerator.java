@@ -68,7 +68,11 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		}
 		this.scxmlPath = scxmlPath;
 		this.adfPath = adfPath;
-		this.outputDir = outputDir;
+		if (outputDir.endsWith("/")) {
+			this.outputDir = outputDir;
+		} else {
+			this.outputDir = outputDir + "/";
+		}
 		this.initialRosPkgName = rosPkgName;
 		this.currentRosPkgName = rosPkgName;
 		engine = new VelocityEngine();

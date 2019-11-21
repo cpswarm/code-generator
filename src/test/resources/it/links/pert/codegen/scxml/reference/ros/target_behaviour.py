@@ -3,7 +3,6 @@
 import rospy
 import smach
 import smach_ros
-import mavros_msgs
 
 from cpswarm_msgs.msg import *
 from swarmros.msg import *
@@ -154,7 +153,7 @@ def main():
 			# ADD Land to MissionAbort #
 			smach.StateMachine.add('Land',
 				smach_ros.ServiceState('cmd/land',
-					std_srvs.srv.Empty),
+					Empty),
 				transitions={})
 		#  ===================================== MissionAbort END =====================================
 

@@ -12,7 +12,7 @@
 			<data id="invoke">
 				<rosaction>
 					<name>cmd/takeoff</name>
-					<action>TakeOff</action>
+					<action>uav_mavros_takeoff/TakeOff</action>
 					<goal type="fixed">
 						<param>1.1</param>
 					</goal>

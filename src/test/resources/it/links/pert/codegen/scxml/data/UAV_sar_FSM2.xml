@@ -19,7 +19,7 @@
 						<data id="invoke">
 							<rosmonitor>
 								<topic>bridge/events/mission_start</topic>
-								<msg>SimpleEvent</msg>
+								<msg>swarmros/SimpleEvent</msg>
 							</rosmonitor>
 						</data>
 					</datamodel>
@@ -38,7 +38,7 @@
 					<data id="invoke">
 						<rosaction>
 							<name>cmd/takeoff</name>
-							<action>TakeOff</action>
+							<action>uav_mavros_takeoff/TakeOff</action>
 							<goal type="fixed">
 								<param>1.5</param>
 							</goal>
@@ -56,7 +56,7 @@
 					<data id="invoke">
 						<rosaction>
 							<name>uav_coverage</name>
-							<action>Coverage</action>
+							<action>cpswarm_msgs/Coverage</action>
 							<goal type="empty" />
 						</rosaction>
 					</data>
@@ -73,7 +73,7 @@
 					<data id="invoke">
 						<rosaction>
 							<name>cmd/assign_task</name>
-							<action>AssignTask</action>
+							<action>cpswarm_msgs/AssignTask</action>
 							<goal type="userdata">
 								<var>target_id</var>
 								<var>pose</var>
@@ -93,7 +93,7 @@
 					<data id="invoke">
 						<rosaction>
 							<name>uav_tracking</name>
-							<action>Tracking</action>
+							<action>cpswarm_msgs/Tracking</action>
 							<goal type="userdata">
 								<var>target</var>
 								<var>cps</var>
@@ -113,7 +113,7 @@
 					<data id="invoke">
 						<rosaction>
 							<name>uav_local_coverage</name>
-							<action>Coverage</action>
+							<action>cpswarm_msgs/Coverage</action>
 							<goal type="empty" />
 						</rosaction>
 					</data>
@@ -132,7 +132,7 @@
 				<data id="invoke">
 					<rosmonitor>
 						<topic>bridge/events/mission_abort</topic>
-						<msg>SimpleEvent</msg>
+						<msg>swarmros/SimpleEvent</msg>
 					</rosmonitor>
 				</data>
 			</datamodel>
@@ -151,7 +151,7 @@
 				<data id="invoke">
 					<rosservice>
 						<name>cmd/land</name>
-						<srv>std_srvs.srv.Empty</srv>
+						<srv>std_srvs/Empty</srv>
 						<request type="empty" />
 					</rosservice>
 				</data>

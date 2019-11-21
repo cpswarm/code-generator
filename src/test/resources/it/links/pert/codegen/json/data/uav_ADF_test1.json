@@ -129,7 +129,7 @@
           "paradigm": "rosaction",
           "definition": {
             "name": "cmd/takeoff",
-            "class": "TakeOff",
+            "class": "uav_mavros/TakeOff",
             "goal": {
               "fields": [
                 {
@@ -151,7 +151,7 @@
           "paradigm": "rosservice",
           "definition": {
             "name": "cmd/land",
-            "class": "Empty"
+            "class": "std_srvs/Empty"
           }
         }
       }

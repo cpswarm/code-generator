@@ -21,6 +21,7 @@ class SCXML2RosTests {
 
 	private static final String OUTPUT_DIR = "test_tmp/";
 	private static File testDirectory;
+	private static boolean DEBUG = false;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SCXML2RosTests.class.getName());
 
@@ -35,7 +36,7 @@ class SCXML2RosTests {
 
 	@AfterAll
 	static void tearDown() {
-		if (testDirectory.exists()) {
+		if (!DEBUG && testDirectory.exists()) {
 			try {
 				FileUtils.deleteDirectory(testDirectory);
 			} catch (IOException e) {
@@ -88,7 +89,7 @@ class SCXML2RosTests {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting testcreateROSFunctions test---------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
-		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json",
+		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM4.xml", "data/uav_ADF_test.json",
 				"rosFunction_takeoff");
 		assertTrue(generator.createNewROSPackage());
 		assertTrue(generator.createROSFunctions());
