@@ -36,7 +36,7 @@
         "inputs": [
           {
             "topic": "mavros/state",
-            "msg_def": {
+            "msg": {
               "class": "mavros_msgs/State",
               "fields": [
                 {
@@ -73,7 +73,7 @@
           },
           {
             "topic": "pos_provider",
-            "msg_def": {
+            "msg": {
               "class": "geometry_msgs/PoseStamped",
               "fields": [
                 {
@@ -90,7 +90,7 @@
           },
           {
             "topic": "mavros/state",
-            "msg_def": {
+            "msg": {
               "class": "geometry_msgs/PoseStamped",
               "fields": [
                 {
@@ -109,7 +109,7 @@
         "outputs": [
           {
             "topic": "pos_controller/goal_position",
-            "msg_def": {
+            "msg": {
               "class": "geometry_msgs/PoseStamped",
               "fields": [
                 {
@@ -164,7 +164,7 @@
         "inputs": [
           {
             "topic": "bridge/events/cps_selection",
-            "msg_def": {
+            "msg": {
               "class": "cpswarm_msgs/TaskAllocationEvent",
               "fields": [
                 {
@@ -194,7 +194,7 @@
         "outputs": [
           {
             "topic": "cps_selected",
-            "msg_def": {
+            "msg": {
               "class": "cpswarm_msgs/TaskAllocatedEvent",
               "fields": [
                 {

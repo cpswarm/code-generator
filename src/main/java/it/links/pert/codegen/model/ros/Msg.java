@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "class", "constants", "fields" })
-public class RosMsg {
+public class Msg {
 
 	/**
 	 * 

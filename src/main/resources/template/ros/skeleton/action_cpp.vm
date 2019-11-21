@@ -1,0 +1,52 @@
+\#include <ros/ros.h>
+\#include <actionlib/server/simple_action_server.h>
+#foreach($class in $fncDescription.api.getInputsDependencyClass())
+\#include <${class}.h>
+#end
+#set($goalClass = ${fncDescription.api.commModel.definition.class_})
+\#include <${fncDescription.name}/${goalClass}Action.h>
+
+using namespace std;
+
+typedef actionlib::SimpleActionServer<${fncDescription.name}::${goalClass}Action> Server;
+
+// Variables
+#foreach($output in $fncDescription.api.outputs)
+ros::Publisher ${output.topic.replace("/", "_")}_pub;
+#end
+
+#foreach($input in $fncDescription.api.inputs)
+ros::Subscriber ${input.topic.replace("/", "_")}_sub;
+#end
+
+//**************** CALLBACKS *******************************************************************************
+
+#foreach($input in $fncDescription.api.inputs)
+void ${input.topic.replace("/", "_")}_cb(const ${input.msg.class_.replace("/", "::")}::ConstPtr &msg) {
+}
+
+#end
+bool execute_cb(const ${fncDescription.name}::${goalClass}Goal::ConstPtr &goal, Server *as) {
+	ROS_DEBUG("${goalClass.toUpperCase()} - Executing ${goalClass} action..");
+}
+
+//*******************************************************************************************************************
+
+int main(int argc, char **argv) {
+	ros::init(argc, argv, "${fncDescription.name}");
+	ros::NodeHandle nh;
+
+	#foreach($input in $fncDescription.api.inputs)
+	${input.topic.replace("/", "_")}_sub = nh.subscribe<${input.msg.class_.replace("/", "::")}>("${input.topic}", 10, ${input.topic.replace("/", "_")}_cb);
+	#end
+
+	#foreach($output in $fncDescription.api.outputs)
+	${output.topic.replace("/", "_")}_pub = nh.advertise<${output.msg.class_.replace("/", "::")}>("${output.topic}", 10);
+	#end
+
+	Server server(nh, "${fncDescription.api.commModel.definition.name}", boost::bind(&execute_cb, _1, &server), false);
+	server.start();
+	ros::spin();
+
+	return 0;
+}

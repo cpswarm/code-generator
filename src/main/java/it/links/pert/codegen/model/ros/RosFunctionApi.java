@@ -1,6 +1,7 @@
 
 package it.links.pert.codegen.model.ros;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -61,5 +62,20 @@ public class RosFunctionApi {
 	@JsonProperty("comm_model")
 	public void setCommModel(CommModel commModel) {
 		this.commModel = commModel;
+	}
+	
+	/**
+	 * Get a list of all {@link Msg} class
+	 * @return List
+	 */
+	public List<String> getInputsDependencyClass() {
+		List<String> dependenciesList = new ArrayList<String>();
+		for (Input input : inputs) {
+			String dependency = input.getMsg().getClass_();
+			if(!dependenciesList.contains(dependency)) {
+				dependenciesList.add(dependency);
+			}
+		}
+		return dependenciesList;
 	}
 }

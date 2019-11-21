@@ -36,7 +36,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SCXML2RosGenerator.class.getName());
 
 	protected final static String FSM_TEMPLATE_FILE = "template/ros/state_machine.vm";
-	protected final static String ACTION_SKELETON_TEMPLATE_FILE = "template/ros/action_skeleton.vm";
+	protected final static String ACTION_SKELETON_TEMPLATE_FILE = "template/ros/skeleton/action_cpp.vm";
 	protected final static String PACKAGE_XML_TEMPLATE_FILE = "template/ros/package_xml.vm";
 	protected final static String CMAKELISTS_TEMPLATE_FILE = "template/ros/cmakelists.vm";
 	protected final static String SMACH_FILE_NAME = "behaviour.py";
@@ -178,12 +178,18 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			if (!functionNames.isEmpty()) {
 				RosADFReader adfReader = new RosADFReader();
 				final RosADF adf = adfReader.read(new File(adfPath));
-				List<RosFunction> rosFunctions = adf.getFunctions();
 				for (final String name : functionNames) {
-					// Generate function skeleton
-					if (!createROSActionSkeleton(name, rosFunctions)) {
-						// If operation FAILS return immediately
-						throw new RosFunctionGenerationException("ROS function generation errror");
+					// Extract function description from ADF
+					RosFunction fncDescription = adf.getFunctionByName(name);
+					if (fncDescription != null) {
+						// Generate function skeleton
+						if (!createROSActionSkeleton(fncDescription)) {
+							// If operation FAILS return immediately
+							throw new RosFunctionGenerationException("ROS function generation error");
+						}
+					} else {
+						throw new RosFunctionGenerationException(
+								"Function description not available for \'" + name + "\'");
 					}
 				}
 			}
@@ -196,17 +202,17 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		return success;
 	}
 
-	private boolean createROSActionSkeleton(final String functionName, final List<RosFunction> descriptionList) {
+	private boolean createROSActionSkeleton(final RosFunction fncDescription) {
 		LOGGER.info("Generating ROS Action Skeleton...");
 		boolean success = false;
 		// TODO to be completed
 		final VelocityContext context = new VelocityContext();
-		context.put("name", functionName);
-		context.put("descriptionList", descriptionList);
+		context.put("fncDescription", fncDescription);
+//		context.put("comm_model", fncDescription.getApi().);
 		/*
 		 * make a writer, and merge the template 'against' the context
 		 */
-		final String path = outputDir + currentRosPkgName + "/src/" + functionName + ".cpp";
+		final String path = outputDir + currentRosPkgName + "/src/" + fncDescription.getName() + ".cpp";
 		try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(path));) {
 			final Template template = engine.getTemplate(ACTION_SKELETON_TEMPLATE_FILE);
 			template.merge(context, writer);

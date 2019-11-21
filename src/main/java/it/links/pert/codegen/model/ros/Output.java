@@ -5,65 +5,62 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "topic",
-    "msg_def"
-})
+@JsonPropertyOrder({ "topic", "msg" })
 public class Output {
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("topic")
-    private String topic;
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("msg_def")
-    private RosMsg RosMsg;
+	/**
+	 * 
+	 * (Required)
+	 * 
+	 */
+	@JsonProperty("topic")
+	private String topic;
+	/**
+	 * 
+	 * (Required)
+	 * 
+	 */
+	@JsonProperty("msg")
+	private Msg msg;
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("topic")
-    public String getTopic() {
-        return topic;
-    }
+	/**
+	 * 
+	 * (Required)
+	 * 
+	 */
+	@JsonProperty("topic")
+	public String getTopic() {
+		return topic;
+	}
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("topic")
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
+	/**
+	 * 
+	 * (Required)
+	 * 
+	 */
+	@JsonProperty("topic")
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("msg_def")
-    public RosMsg getMsgDef() {
-        return RosMsg;
-    }
+	/**
+	 * 
+	 * (Required)
+	 * 
+	 */
+	@JsonProperty("msg")
+	public Msg getMsg() {
+		return msg;
+	}
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("msg_def")
-    public void setMsgDef(RosMsg msgDef) {
-        this.RosMsg = msgDef;
-    }
+	/**
+	 * 
+	 * (Required)
+	 * 
+	 */
+	@JsonProperty("msg")
+	public void setMsg(Msg msg) {
+		this.msg = msg;
+	}
 
 }

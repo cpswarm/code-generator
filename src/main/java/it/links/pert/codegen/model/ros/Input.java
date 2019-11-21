@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "topic", "msg_def" })
+@JsonPropertyOrder({ "topic", "msg" })
 public class Input {
 
 	/**
@@ -20,8 +20,8 @@ public class Input {
 	 * (Required)
 	 * 
 	 */
-	@JsonProperty("msg_def")
-	private RosMsg rosMsg;
+	@JsonProperty("msg")
+	private Msg msg;
 
 	/**
 	 * 
@@ -48,9 +48,9 @@ public class Input {
 	 * (Required)
 	 * 
 	 */
-	@JsonProperty("msg_def")
-	public RosMsg getMsg() {
-		return rosMsg;
+	@JsonProperty("msg")
+	public Msg getMsg() {
+		return msg;
 	}
 
 	/**
@@ -58,9 +58,9 @@ public class Input {
 	 * (Required)
 	 * 
 	 */
-	@JsonProperty("msg_def")
-	public void setMsg(RosMsg rosMsg) {
-		this.rosMsg = rosMsg;
+	@JsonProperty("msg")
+	public void setMsg(Msg msg) {
+		this.msg = msg;
 	}
 
 }
