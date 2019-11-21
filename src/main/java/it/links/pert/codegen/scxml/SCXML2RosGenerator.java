@@ -165,9 +165,12 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	}
 
 	// ************************************************************************//
-	/*
+
+	/**
 	 * Generate ROS functions skeleton Functions to be generated are extracted from
 	 * SCXML file Data to generate function code are extracted from ADF json file
+	 * 
+	 * @return boolean Return true if generation process completed correctly
 	 */
 	protected boolean createROSFunctions() {
 		boolean success = false;
@@ -226,9 +229,11 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	}
 
 	// ************************************************************************//
-	/*
+	/**
 	 * Generate SMACH FSM (python) Data to generate the code are extracted from
 	 * SCXML file
+	 * 
+	 * @return boolean Return true if generation process completed correctly
 	 */
 	protected boolean generateFSMBehavior() {
 		LOGGER.info("Generating FSM behavior...");

@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -22,8 +20,6 @@ import org.slf4j.LoggerFactory;
 class SCXML2RosTests {
 
 	private static final String OUTPUT_DIR = "test_tmp/";
-	private static final String REF_FILE_DIR = "/it/links/pert/codegen/scxml/reference/ros/";
-	private static final Path resourceDirectory = Paths.get("src", "test", "resources");
 	private static File testDirectory;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SCXML2RosTests.class.getName());
@@ -35,7 +31,6 @@ class SCXML2RosTests {
 		if (!testDirectory.exists()) {
 			testDirectory.mkdir();
 		}
-		// Initialize @SCXML2RosGenerator instance
 	}
 
 	@AfterAll
@@ -44,10 +39,19 @@ class SCXML2RosTests {
 			try {
 				FileUtils.deleteDirectory(testDirectory);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private SCXML2RosGenerator getGenerator(final String scxmlName, final String adfName, final String pkgName) {
+		return new SCXML2RosGenerator(SCXML2RosTests.class.getResource(scxmlName).getFile(),
+				SCXML2RosTests.class.getResource(adfName).getFile(), OUTPUT_DIR, pkgName);
+	}
+
+	private SCXML2RosGenerator getGenerator(final String scxmlName, final String adfName) {
+		return new SCXML2RosGenerator(SCXML2RosTests.class.getResource(scxmlName).getFile(),
+				SCXML2RosTests.class.getResource(adfName).getFile(), OUTPUT_DIR);
 	}
 
 	@Test
@@ -56,10 +60,8 @@ class SCXML2RosTests {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting testCreateROSPackage test-----------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
-		final String scxmlPath = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
-		final String adfPath = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
-		final SCXML2RosGenerator generator = new SCXML2RosGenerator(resourceDirectory + scxmlPath,
-				resourceDirectory + adfPath, OUTPUT_DIR, "createROSpkg");
+		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json",
+				"createROSpkg");
 		assertTrue(generator.createNewROSPackage());
 	}
 
@@ -69,10 +71,8 @@ class SCXML2RosTests {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting testCreateROSPackageWithExistingDir test--------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
-		final String scxmlPath = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
-		final String adfPath = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
-		final SCXML2RosGenerator generator = new SCXML2RosGenerator(resourceDirectory + scxmlPath,
-				resourceDirectory + adfPath, OUTPUT_DIR, "existing_pkg");
+		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json",
+				"existing_pkg");
 		assertTrue(generator.createNewROSPackage());
 		final File beahaviorPkg = new File(OUTPUT_DIR + generator.getLastGeneratedPkgName());
 		if (beahaviorPkg.exists())
@@ -88,10 +88,8 @@ class SCXML2RosTests {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting testcreateROSFunctions test---------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
-		final String scxmlPath = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
-		final String adfPath = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
-		final SCXML2RosGenerator generator = new SCXML2RosGenerator(resourceDirectory + scxmlPath,
-				resourceDirectory + adfPath, OUTPUT_DIR, "rosFunction1");
+		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json",
+				"rosFunction_takeoff");
 		assertTrue(generator.createNewROSPackage());
 		assertTrue(generator.createROSFunctions());
 	}
@@ -102,10 +100,8 @@ class SCXML2RosTests {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting testGenerate test-------------------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
-		final String scxmlPath = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
-		final String adfPath = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
-		final SCXML2RosGenerator generator = new SCXML2RosGenerator(resourceDirectory + scxmlPath,
-				resourceDirectory + adfPath, OUTPUT_DIR, "fsm_generate");
+		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json",
+				"fsm_generate");
 		assertTrue(generator.generate());
 	}
 
@@ -115,17 +111,14 @@ class SCXML2RosTests {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		LOGGER.info("--------------------Starting validateGeneratedFiles test---------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
-		final String scxmlPath = "/it/links/pert/codegen/scxml/data/UAV_sar_FSM2.xml";
-		final String adfPath = "/it/links/pert/codegen/scxml/data/uav_ADF_test.json";
-		final SCXML2RosGenerator generator = new SCXML2RosGenerator(resourceDirectory + scxmlPath,
-				resourceDirectory + adfPath, OUTPUT_DIR);
+		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json");
 		generator.generate();
 
 		final String base_dir_path = OUTPUT_DIR + generator.getLastGeneratedPkgName();
-		final Path resourceDirectory = Paths.get("src", "test", "resources");
 		// Test generated behaviour against reference file
 		final File behaviour = new File(base_dir_path + "/scripts/" + SCXML2RosGenerator.SMACH_FILE_NAME);
-		final File behaviour_ref = new File(resourceDirectory + REF_FILE_DIR + "target_behaviour.py");
+		final File behaviour_ref = new File(
+				SCXML2RosTests.class.getResource("reference/ros/target_behaviour.py").getFile());
 		try {
 			assertTrue(FileUtils.contentEquals(behaviour_ref, behaviour));
 		} catch (IOException e) {
@@ -133,7 +126,8 @@ class SCXML2RosTests {
 		}
 		// Test generated CMakeLists.txt against reference file
 		final File cmakeFile = new File(base_dir_path + "/CMakeLists.txt");
-		final File cmakeFile_ref = new File(resourceDirectory + REF_FILE_DIR + "target_CMakeLists.txt");
+		final File cmakeFile_ref = new File(
+				SCXML2RosTests.class.getResource("reference/ros/target_CMakeLists.txt").getFile());
 		try {
 			assertTrue(FileUtils.contentEquals(cmakeFile_ref, cmakeFile));
 		} catch (IOException e) {
@@ -141,7 +135,8 @@ class SCXML2RosTests {
 		}
 		// Test generated package.xml against reference file
 		final File packageXMLFile = new File(base_dir_path + "/package.xml");
-		final File packageXMLFile_ref = new File(resourceDirectory + REF_FILE_DIR + "target_package.xml");
+		final File packageXMLFile_ref = new File(
+				SCXML2RosTests.class.getResource("reference/ros/target_package.xml").getFile());
 		try {
 			assertTrue(FileUtils.contentEquals(packageXMLFile_ref, packageXMLFile));
 		} catch (IOException e) {
@@ -149,7 +144,8 @@ class SCXML2RosTests {
 		}
 		// Test generated package.xml against reference file
 		final File rosFncFile = new File(base_dir_path + "/src/" + "uav_mavros_takeoff.cpp");
-		final File rosFncFile_ref = new File(resourceDirectory + REF_FILE_DIR + "target_takeoff.cpp");
+		final File rosFncFile_ref = new File(
+				SCXML2RosTests.class.getResource("reference/ros/target_takeoff.cpp").getFile());
 		try {
 			assertTrue(FileUtils.contentEquals(rosFncFile_ref, rosFncFile));
 		} catch (IOException e) {
