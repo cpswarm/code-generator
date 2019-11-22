@@ -1,31 +1,46 @@
 #*************************************************************************************************
-*	generate Action State
+* Generate Action State
 *###
+## Get tags from Datamodel contained in $action_content
 #set($goal_tag = $action_content.getElementsByTagName("goal").item(0))
+#set($goal_type = $goal_tag.getAttributes().item(0).getNodeValue())
 #set($name_tag = $action_content.getElementsByTagName("name").item(0))
 #set($action_fullname = $action_content.getElementsByTagName("action").item(0).getFirstChild().getNodeValue())
+#set($result_tag = $action_content.getElementsByTagName("result").item(0))
+#set($result_type = $result_tag.getAttributes().item(0).getNodeValue())
 #set($start = $action_fullname.indexOf('/') + 1)
 #set($end = $action_fullname.length())
 #set($action_class = $action_fullname.substring($start, $end))
 	${indent}smach_ros.SimpleActionState('$name_tag.getFirstChild().getNodeValue()',
-	#if($goal_tag.getAttributes().item(0).getNodeValue() == "empty")
-		${indent}${action_class}Action)#if($continue),#end
-	#elseif($goal_tag.getAttributes().item(0).getNodeValue() == "fixed")
+	#if($goal_type == "empty")
+		${indent}${action_class}Action#if($result_type == "empty"))#if($continue),#end#else,#end
+		#if($result_type != "empty")
+			#parse("template/ros/atomic/ROS_action_result.vm")
+		#end
+	#elseif($goal_type == "fixed")
 		${indent}${action_class}Action,
 		#set($param_list = $goal_tag.getElementsByTagName("param"))
 		#set($last = $param_list.getLength() - 1)
 		#set($goal = ${action_class} + 'Goal(')
 		${indent}goal=$goal#foreach($i in [0..$last])
-			#if($i == $last)${param_list.item($i).getFirstChild().getNodeValue()}))#if($continue),#end#else${param_list.item($i).getFirstChild().getNodeValue()}, #end
+			#if($i == $last)${param_list.item($i).getFirstChild().getNodeValue()})#if($result_type == "empty"))#if($continue),#end#else,#end#else${param_list.item($i).getFirstChild().getNodeValue()}, #end#end
+		#if($result_type != "empty")
+			#parse("template/ros/atomic/ROS_action_result.vm")
 		#end
-	#elseif($goal_tag.getAttributes().item(0).getNodeValue() == "userdata")
+	#elseif($goal_type == "userdata")
 		${indent}${action_class}Action,
 		#set($var_list = $goal_tag.getElementsByTagName("var"))
 		#set($last = $var_list.getLength() - 1)
 		${indent}goal_slots=[#foreach($i in [0..$last])
-			#if($i == $last)'${var_list.item($i).getFirstChild().getNodeValue()}'])#if($continue),#end#else'${var_list.item($i).getFirstChild().getNodeValue()}', #end
+			#if($i == $last)'${var_list.item($i).getFirstChild().getNodeValue()}']#if($result_type == "empty"))#if($continue),#end#else,#end#else'${var_list.item($i).getFirstChild().getNodeValue()}', #end#end
+		#if($result_type != "empty")
+			#parse("template/ros/atomic/ROS_action_result.vm")
 		#end
-	#elseif($goal_tag.getAttributes().item(0).getNodeValue() == "callback")
+	#elseif($goal_type == "callback")
 		${indent}${action_class}Action,
-		${indent}goal_cb=${action_class.toLowerCase()}_cb)#if($continue),#end
+		${indent}goal_cb=${action_class.toLowerCase()}_cb,
+		${indent}input_keys=[''])#if($result_type == "empty"))#if($continue),#end#else,#end
+		#if($result_type != "empty")
+			#parse("template/ros/atomic/ROS_action_result.vm")
+		#end
 	#end

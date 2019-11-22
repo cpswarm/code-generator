@@ -16,6 +16,7 @@
 					<goal type="fixed">
 						<param>1.1</param>
 					</goal>
+					<result type="empty" />
 				</rosaction>
 			</data>
 			<data id="input"></data>
@@ -30,6 +31,7 @@
 					<name>uav_coverage</name>
 					<action>cpswarm_msgs/Coverage</action>
 					<goal type="empty" />
+					<result type="empty" />
 				</rosaction>
 			</data>
 		</datamodel>

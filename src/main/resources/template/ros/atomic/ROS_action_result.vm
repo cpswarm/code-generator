@@ -1,0 +1,6 @@
+	#if($result_type == "userdata")
+		${indent}result_slots=[])#if($continue),#end
+	#elseif($result_type == "callback")
+		${indent}result_cb=${action_class.toLowerCase()}_result_cb,
+		${indent}output_keys=[''])#if($continue),#end
+	#end

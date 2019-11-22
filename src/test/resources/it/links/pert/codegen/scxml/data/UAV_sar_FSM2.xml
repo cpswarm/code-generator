@@ -42,6 +42,7 @@
 							<goal type="fixed">
 								<param>1.5</param>
 							</goal>
+							<result type="empty" />
 						</rosaction>
 					</data>
 				</datamodel>
@@ -58,6 +59,7 @@
 							<name>uav_coverage</name>
 							<action>cpswarm_msgs/Coverage</action>
 							<goal type="empty" />
+							<result type="empty" />
 						</rosaction>
 					</data>
 				</datamodel>
@@ -78,6 +80,7 @@
 								<var>target_id</var>
 								<var>pose</var>
 							</goal>
+							<result type="empty" />
 						</rosaction>
 					</data>
 				</datamodel>
@@ -98,6 +101,7 @@
 								<var>target</var>
 								<var>cps</var>
 							</goal>
+							<result type="empty" />
 						</rosaction>
 					</data>
 				</datamodel>
@@ -115,6 +119,7 @@
 							<name>uav_local_coverage</name>
 							<action>cpswarm_msgs/Coverage</action>
 							<goal type="empty" />
+							<result type="empty" />
 						</rosaction>
 					</data>
 				</datamodel>
@@ -153,6 +158,7 @@
 						<name>cmd/land</name>
 						<srv>std_srvs/Empty</srv>
 						<request type="empty" />
+						<result type="empty" />
 					</rosservice>
 				</data>
 			</datamodel>
