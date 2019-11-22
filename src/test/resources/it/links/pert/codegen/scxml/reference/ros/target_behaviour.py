@@ -47,7 +47,8 @@ def main():
 			outcomes=['missionAbort', 'aborted'],
 			default_outcome='missionAbort',
 			child_termination_cb=lambda so: True,
-			outcome_cb=out_cb)
+			outcome_cb=out_cb
+		)
 
 		# Open the container
 		with sarthreads_concurrence:
@@ -55,7 +56,8 @@ def main():
 			# ===================================== SarBehavior =====================================
 			# Create a State Machine container
 			sarbehavior_sm = smach.StateMachine(
-				outcomes=['succeeded', 'preempted', 'aborted'])
+				outcomes=['succeeded', 'preempted', 'aborted']
+			)
 
 			# Open the container
 			with sarbehavior_sm:
@@ -71,7 +73,8 @@ def main():
 					outcomes=['missionStart', 'aborted'],
 					default_outcome='missionStart',
 					child_termination_cb=lambda so: True,
-					outcome_cb=out_cb)
+					outcome_cb=out_cb
+				)
 
 				# Open the container
 				with idlethreads_concurrence:
@@ -85,46 +88,53 @@ def main():
 					smach.Concurrence.add('IdleEventMonitoring',
 						smach_ros.MonitorState('bridge/events/mission_start',
 							SimpleEvent,
-							cond_cb=lambda ud, msg: False))
+							cond_cb=lambda ud, msg: False)
+					)
 				#  ===================================== IdleThreads END =====================================
 
 				# ADD IdleThreads to SarBehavior #
 				smach.StateMachine.add('IdleThreads',
 					idlethreads_concurrence,
-					transitions={'missionStart':'TakeOff'})
+					transitions={'missionStart':'TakeOff'}
+				)
 
 				# ADD TakeOff to SarBehavior #
 				smach.StateMachine.add('TakeOff',
 					smach_ros.SimpleActionState('cmd/takeoff',
 						TakeOffAction,
 						goal=TakeOffGoal(1.5)),
-					transitions={'succeeded':'Coverage'})
+					transitions={'succeeded':'Coverage'}
+				)
 
 				# ADD Coverage to SarBehavior #
 				smach.StateMachine.add('Coverage',
 					smach_ros.SimpleActionState('uav_coverage',
 						CoverageAction),
-					transitions={'succeeded':'SelectRover'})
+					transitions={'succeeded':'SelectRover'}
+				)
 
 				# ADD SelectRover to SarBehavior #
 				smach.StateMachine.add('SelectRover',
 					smach_ros.SimpleActionState('cmd/assign_task',
 						AssignTaskAction,
 						goal_slots=['target_id', 'pose']),
-					transitions={'succeeded':'Tracking', 'aborted':'SelectRover'})
+					transitions={'succeeded':'Tracking', 'aborted':'SelectRover'}
+				)
 
 				# ADD Tracking to SarBehavior #
 				smach.StateMachine.add('Tracking',
 					smach_ros.SimpleActionState('uav_tracking',
 						TrackingAction,
 						goal_slots=['target', 'cps']),
-					transitions={'succeeded':'Coverage', 'aborted':'LocalCoverage'})
+					transitions={'succeeded':'Coverage', 'aborted':'LocalCoverage'}
+				)
 
 				# ADD LocalCoverage to SarBehavior #
 				smach.StateMachine.add('LocalCoverage',
 					smach_ros.SimpleActionState('uav_local_coverage',
 						CoverageAction),
-					transitions={'aborted':'Coverage', 'succeeded':'Tracking'})
+					transitions={'aborted':'Coverage', 'succeeded':'Tracking'}
+				)
 			#  ===================================== SarBehavior END =====================================
 
 			# ADD SarBehavior to SarThreads #
@@ -134,18 +144,21 @@ def main():
 			smach.Concurrence.add('AbortEventMonitoring',
 				smach_ros.MonitorState('bridge/events/mission_abort',
 					SimpleEvent,
-					cond_cb=lambda ud, msg: False))
+					cond_cb=lambda ud, msg: False)
+			)
 		#  ===================================== SarThreads END =====================================
 
 		# ADD SarThreads to TOP state #
 		smach.StateMachine.add('SarThreads',
 			sarthreads_concurrence,
-			transitions={'missionAbort':'MissionAbort'})
+			transitions={'missionAbort':'MissionAbort'}
+		)
 
 		# ===================================== MissionAbort =====================================
 		# Create a State Machine container
 		missionabort_sm = smach.StateMachine(
-			outcomes=['succeeded'])
+			outcomes=['succeeded']
+		)
 
 		# Open the container
 		with missionabort_sm:
@@ -154,13 +167,15 @@ def main():
 			smach.StateMachine.add('Land',
 				smach_ros.ServiceState('cmd/land',
 					Empty),
-				transitions={})
+				transitions={}
+			)
 		#  ===================================== MissionAbort END =====================================
 
 		# ADD MissionAbort to TOP state #
 		smach.StateMachine.add('MissionAbort',
 			missionabort_sm,
-			transitions={'succeeded':'SarThreads'})
+			transitions={'succeeded':'SarThreads'}
+		)
 	
 	# Create and start the introspection server (uncomment if needed)
 	# sis = smach_ros.IntrospectionServer('smach_server', top_sm, '/SM_TOP')
