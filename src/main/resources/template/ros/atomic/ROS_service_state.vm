@@ -1,30 +1,46 @@
 #*************************************************************************************************
 *	Generate code for ROS Service State
 *###
+## Get tags from Datamodel contained in $service_content
 #set($request_tag = $service_content.getElementsByTagName("request").item(0))
+#set($request_type = $request_tag.getAttributes().item(0).getNodeValue())
 #set($name_tag = $service_content.getElementsByTagName("name").item(0))
-#set($srv_tag = $service_content.getElementsByTagName("srv").item(0))
 #set($srv_fullname = $service_content.getElementsByTagName("srv").item(0).getFirstChild().getNodeValue())
+#set($response_tag = $service_content.getElementsByTagName("response").item(0))
+#set($response_type = $response_tag.getAttributes().item(0).getNodeValue())
 #set($start = $srv_fullname.indexOf('/') + 1)
 #set($end = $srv_fullname.length())
 #set($srv_class = $srv_fullname.substring($start, $end))
 	${indent}smach_ros.ServiceState('$name_tag.getFirstChild().getNodeValue()',
-	#if($request_tag.getAttributes().item(0).getNodeValue() == "empty")
-		${indent}${srv_class})#if($continue),#end
-	#elseif($request_tag.getAttributes().item(0).getNodeValue() == "fixed")
+	#if($request_type == "empty")
+		${indent}${srv_class}#if($response_type == "empty"))#if($continue),#end#else,#end
+		#if($response_type != "empty")
+			#parse("template/ros/atomic/ROS_service_response.vm")
+		#end
+	#elseif($request_type == "fixed")
 		${indent}${srv_class},
-		#set($param_list = $goal_tag.getElementsByTagName("param"))
+		#set($param_list = $request_tag.getElementsByTagName("param"))
 		#set($last = $param_list.getLength() - 1)
 		#set($request = ${service_content.item(1).getFirstChild().getNodeValue()} + 'Request(')
 		${indent}request=$request#foreach($i in [0..$last])
-			#if($i == $last)${param_list.item($i).getFirstChild().getNodeValue()}))#if($continue),#end#else${param_list.item($i).getFirstChild().getNodeValue()}, #end#end
-	#elseif($request_tag.getAttributes().item(0).getNodeValue() == "userdata")
+			#if($i == $last)${param_list.item($i).getFirstChild().getNodeValue()})#if($response_type == "empty"))#if($continue),#end#else,#end#else${param_list.item($i).getFirstChild().getNodeValue()}, #end#end
+		#if($response_type != "empty")
+			#parse("template/ros/atomic/ROS_service_response.vm")
+		#end
+	#elseif($request_type == "userdata")
 		${indent}${srv_class},
-		#set($var_list = $goal_tag.getElementsByTagName("var"))
+		#set($var_list = $request_tag.getElementsByTagName("var"))
 		#set($last = $var_list.getLength() - 1)
 		${indent}request_slots=[#foreach($i in [0..$last])
-			#if($i == $last)'${var_list.item($i).getFirstChild().getNodeValue()}'])#if($continue),#end#else'${var_list.item($i).getFirstChild().getNodeValue()}', #end#end
-	#elseif($request_tag.getAttributes().item(0).getNodeValue() == "callback")
+			#if($i == $last)'${var_list.item($i).getFirstChild().getNodeValue()}']#if($response_type == "empty"))#if($continue),#end#else,#end#else'${var_list.item($i).getFirstChild().getNodeValue()}', #end#end
+		#if($response_type != "empty")
+			#parse("template/ros/atomic/ROS_service_response.vm")
+		#end
+	#elseif($request_type == "callback")
 		${indent}${srv_class},
-		${indent}request_cb=${srv_class.toLowerCase()}_cb)#if($continue),#end
+		${indent}request_cb=${srv_class.toLowerCase()}_request_cb,
+		${indent}input_keys=['']#if($response_type == "empty"))#if($continue),#end#else,#end
+		#if($response_type != "empty")
+			#parse("template/ros/atomic/ROS_service_response.vm")
+		#end
 	#end

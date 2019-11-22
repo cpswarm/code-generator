@@ -97,23 +97,23 @@ class SCXML2RosTest {
 		LOGGER.info("--------------------Starting testGenerate test-------------------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json",
-				"fsm_generate");
+				"test_generate");
 		assertTrue(generator.generate());
 	}
 
 	@Test
-	public void testBehaviourGeneration1() {
+	public void testActionEmptyEmpty() {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
-		LOGGER.info("--------------------Starting testBehaviourGeneration1 test-------------------------------");
+		LOGGER.info("--------------------Starting testActionEmptyEmpty test-------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
-		final SCXML2RosGenerator generator = getGenerator("data/action_goal_empty.xml", "data/uav_ADF_test.json",
-				"fsm_gen");
+		final SCXML2RosGenerator generator = getGenerator("data/action_empty_empty.xml", "data/uav_ADF_test.json",
+				"action_empty_empty");
 		assertTrue(generator.generate());
 		// Test generated behaviour against reference file
 		final String base_dir_path = OUTPUT_DIR + generator.getLastGeneratedPkgName();
 		final File behaviour = new File(base_dir_path + "/scripts/" + SCXML2RosGenerator.SMACH_FILE_NAME);
 		final File behaviour_ref = new File(
-				SCXML2RosTest.class.getResource("reference/ros/action_goal_empty.py").getFile());
+				SCXML2RosTest.class.getResource("reference/ros/action_empty_empty.py").getFile());
 		try {
 			assertTrue(FileUtils.contentEquals(behaviour_ref, behaviour));
 		} catch (IOException e) {
@@ -122,18 +122,58 @@ class SCXML2RosTest {
 	}
 	
 	@Test
-	public void testBehaviourGeneration2() {
+	public void testServiceEmptyEmpty() {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
-		LOGGER.info("--------------------Starting testBehaviourGeneration2 test-------------------------------");
+		LOGGER.info("--------------------Starting testServiceEmptyEmpty test-------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
-		final SCXML2RosGenerator generator = getGenerator("data/service_goal_empty.xml", "data/uav_ADF_test.json",
-				"fsm_gen");
+		final SCXML2RosGenerator generator = getGenerator("data/service_empty_empty.xml", "data/uav_ADF_test.json",
+				"service_empty_empty");
 		assertTrue(generator.generate());
 		// Test generated behaviour against reference file
 		final String base_dir_path = OUTPUT_DIR + generator.getLastGeneratedPkgName();
 		final File behaviour = new File(base_dir_path + "/scripts/" + SCXML2RosGenerator.SMACH_FILE_NAME);
 		final File behaviour_ref = new File(
-				SCXML2RosTest.class.getResource("reference/ros/service_goal_empty.py").getFile());
+				SCXML2RosTest.class.getResource("reference/ros/service_empty_empty.py").getFile());
+		try {
+			assertTrue(FileUtils.contentEquals(behaviour_ref, behaviour));
+		} catch (IOException e) {
+			fail("Behaviour files should be available");
+		}
+	}
+	
+	@Test
+	public void testServiceCbCb() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testServiceCbCb test-------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final SCXML2RosGenerator generator = getGenerator("data/service_cb_cb.xml", "data/uav_ADF_test.json",
+				"service_cb_cb");
+		assertTrue(generator.generate());
+		// Test generated behaviour against reference file
+		final String base_dir_path = OUTPUT_DIR + generator.getLastGeneratedPkgName();
+		final File behaviour = new File(base_dir_path + "/scripts/" + SCXML2RosGenerator.SMACH_FILE_NAME);
+		final File behaviour_ref = new File(
+				SCXML2RosTest.class.getResource("reference/ros/service_cb_cb.py").getFile());
+		try {
+			assertTrue(FileUtils.contentEquals(behaviour_ref, behaviour));
+		} catch (IOException e) {
+			fail("Behaviour files should be available");
+		}
+	}
+	
+	@Test
+	public void testServiceUserCb() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testServiceUserCb test-------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final SCXML2RosGenerator generator = getGenerator("data/service_user_cb.xml", "data/uav_ADF_test.json",
+				"service_user_cb");
+		assertTrue(generator.generate());
+		// Test generated behaviour against reference file
+		final String base_dir_path = OUTPUT_DIR + generator.getLastGeneratedPkgName();
+		final File behaviour = new File(base_dir_path + "/scripts/" + SCXML2RosGenerator.SMACH_FILE_NAME);
+		final File behaviour_ref = new File(
+				SCXML2RosTest.class.getResource("reference/ros/service_user_cb.py").getFile());
 		try {
 			assertTrue(FileUtils.contentEquals(behaviour_ref, behaviour));
 		} catch (IOException e) {

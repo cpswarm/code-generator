@@ -38,7 +38,7 @@
 		#end
 	#elseif($goal_type == "callback")
 		${indent}${action_class}Action,
-		${indent}goal_cb=${action_class.toLowerCase()}_cb,
+		${indent}goal_cb=${action_class.toLowerCase()}_goal_cb,
 		${indent}input_keys=[''])#if($result_type == "empty"))#if($continue),#end#else,#end
 		#if($result_type != "empty")
 			#parse("template/ros/atomic/ROS_action_result.vm")

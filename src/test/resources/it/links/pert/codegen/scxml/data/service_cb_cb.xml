@@ -23,12 +23,15 @@
 		<!-- **************** TAKEOFF ******************** -->
 		<state id="TakeOff">
 			<datamodel>
+				<data id="adf">
+					<name>uav_mavros_takeoff</name>
+				</data>
 				<data id="invoke">
 					<rosservice>
 						<name>cmd/takeoff</name>
 						<srv>uav_mavros_takeoff/TakeOff</srv>
-						<request type="empty" />
-						<result type="empty" />
+						<request type="callback" />
+						<response type="callback" />
 					</rosservice>
 				</data>
 			</datamodel>
