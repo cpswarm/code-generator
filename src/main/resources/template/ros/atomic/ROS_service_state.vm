@@ -22,8 +22,7 @@
 		#set($param_list = $request_tag.getElementsByTagName("param"))
 		#set($last = $param_list.getLength() - 1)
 		#set($request = ${service_content.item(1).getFirstChild().getNodeValue()} + 'Request(')
-		${indent}request=$request#foreach($i in [0..$last])
-			#if($i == $last)${param_list.item($i).getFirstChild().getNodeValue()})#if($response_type == "empty"))#if($continue),#end#else,#end#else${param_list.item($i).getFirstChild().getNodeValue()}, #end#end
+		${indent}request=$request#foreach($i in [0..$last])${param_list.item($i).getFirstChild().getNodeValue()}#if($i == $last))#if($response_type == "empty"))#if($continue),#end#else,#end#else, #end#end
 		#if($response_type != "empty")
 			#parse("template/ros/atomic/ROS_service_response.vm")
 		#end
@@ -31,8 +30,7 @@
 		${indent}${srv_class},
 		#set($var_list = $request_tag.getElementsByTagName("var"))
 		#set($last = $var_list.getLength() - 1)
-		${indent}request_slots=[#foreach($i in [0..$last])
-			#if($i == $last)'${var_list.item($i).getFirstChild().getNodeValue()}']#if($response_type == "empty"))#if($continue),#end#else,#end#else'${var_list.item($i).getFirstChild().getNodeValue()}', #end#end
+		${indent}request_slots=[#foreach($i in [0..$last])'${var_list.item($i).getFirstChild().getNodeValue()}'#if($i == $last)]#if($response_type == "empty"))#if($continue),#end#else,#end#else, #end#end
 		#if($response_type != "empty")
 			#parse("template/ros/atomic/ROS_service_response.vm")
 		#end

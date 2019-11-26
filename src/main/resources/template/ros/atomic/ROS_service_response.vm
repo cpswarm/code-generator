@@ -4,8 +4,7 @@
 	#if($response_type == "userdata")
 		#set($var_list = $response_tag.getElementsByTagName("var"))
 		#set($last = $var_list.getLength() - 1)
-		${indent}response_slots=[#foreach($i in [0..$last])
-			#if($i == $last)'${var_list.item($i).getFirstChild().getNodeValue()}'])#if($continue),#end#else'${var_list.item($i).getFirstChild().getNodeValue()}', #end#end
+		${indent}response_slots=[#foreach($i in [0..$last])'${var_list.item($i).getFirstChild().getNodeValue()}'#if($i == $last)])#if($continue),#end#else, #end#end
 	#elseif($response_type == "callback")
 		${indent}response_cb=${srv_class.toLowerCase()}_response_cb,
 		${indent}output_keys=[''])#if($continue),#end

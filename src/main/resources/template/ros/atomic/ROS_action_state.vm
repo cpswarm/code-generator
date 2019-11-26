@@ -22,8 +22,7 @@
 		#set($param_list = $goal_tag.getElementsByTagName("param"))
 		#set($last = $param_list.getLength() - 1)
 		#set($goal = ${action_class} + 'Goal(')
-		${indent}goal=$goal#foreach($i in [0..$last])
-			#if($i == $last)${param_list.item($i).getFirstChild().getNodeValue()})#if($result_type == "empty"))#if($continue),#end#else,#end#else${param_list.item($i).getFirstChild().getNodeValue()}, #end#end
+		${indent}goal=$goal#foreach($i in [0..$last])${param_list.item($i).getFirstChild().getNodeValue()}#if($i == $last))#if($result_type == "empty"))#if($continue),#end#else,#end#else, #end#end
 		#if($result_type != "empty")
 			#parse("template/ros/atomic/ROS_action_result.vm")
 		#end
@@ -31,8 +30,7 @@
 		${indent}${action_class}Action,
 		#set($var_list = $goal_tag.getElementsByTagName("var"))
 		#set($last = $var_list.getLength() - 1)
-		${indent}goal_slots=[#foreach($i in [0..$last])
-			#if($i == $last)'${var_list.item($i).getFirstChild().getNodeValue()}']#if($result_type == "empty"))#if($continue),#end#else,#end#else'${var_list.item($i).getFirstChild().getNodeValue()}', #end#end
+		${indent}goal_slots=[#foreach($i in [0..$last])'${var_list.item($i).getFirstChild().getNodeValue()}'#if($i == $last)]#if($result_type == "empty"))#if($continue),#end#else,#end#else, #end#end
 		#if($result_type != "empty")
 			#parse("template/ros/atomic/ROS_action_result.vm")
 		#end
