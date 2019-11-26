@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml initial="SarBehavior" name="sar" version="1.0"
+	xmlns="http://www.w3.org/2005/07/scxml"
+	xmlns:cpswarm="http://my.custom-actions.domain/cpswarm/CUSTOM">
+	<!-- ******************** SAR BEHAVIOR ******************** -->
+	<state id="SarBehavior">
+		<!-- ******************** IDLE THREADS ******************** -->
+		<parallel id="IdleThreads">
+			<state id="Idle" />
+			<state id="IdleEventMonitoring">
+				<datamodel>
+					<data id="invoke">
+						<rosmonitor>
+							<topic>bridge/events/mission_start</topic>
+							<msg>swarmros/SimpleEvent</msg>
+						</rosmonitor>
+					</data>
+				</datamodel>
+				<invoke type="ROS_MONITOR" />
+			</state>
+			<transition event="missionStart" target="TakeOff" />
+		</parallel>
+		<!-- **************** TAKEOFF ******************** -->
+		<state id="TakeOff">
+			<datamodel>
+				<data id="invoke">
+					<rosaction>
+						<name>cmd/takeoff</name>
+						<action>uav_mavros_takeoff/TakeOff</action>
+						<goal type="callback" />
+						<result type="userdata">
+							<var>res1</var>
+							<var>res2</var>
+						</result>
+					</rosaction>
+				</data>
+			</datamodel>
+			<invoke type="ROS_ACTION" />
+			<transition event="succeeded" target="CoverageThreads" />
+		</state>
+		<!-- ******************** COVERAGE THREADS ******************** -->
+		<parallel id="CoverageThreads">
+			<state id="Coverage">
+				<datamodel>
+					<data id="invoke">
+						<rosaction>
+							<name>uav_coverage</name>
+							<action>cpswarm_msgs/Coverage</action>
+							<goal type="empty" />
+							<result type="userdata">
+								<var>target_id</var>
+								<var>target_pose</var>
+							</result>
+						</rosaction>
+						<mappings>
+							<map>
+								<x>target_id</x>
+								<y>target_id</y>
+							</map>
+							<map>
+								<x>target_pose</x>
+								<y>target_pose</y>
+							</map>
+						</mappings>
+					</data>
+				</datamodel>
+				<invoke type="ROS_ACTION" />
+			</state>
+			<state id="CoverageMonitoring">
+				<datamodel>
+					<data id="invoke">
+						<rosmonitor>
+							<topic>bridge/events/substitute</topic>
+							<msg>cpswarm_msgs/TargetPositionEvent</msg>
+						</rosmonitor>
+					</data>
+				</datamodel>
+				<invoke type="ROS_MONITOR" />
+			</state>
+			<transition event="succeeded" target="IdleThreads" />
+		</parallel>
+	</state>
+</scxml>
