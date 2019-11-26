@@ -145,8 +145,19 @@ ${indent}#  ===================================== ${state.id} END ==============
 #if(!$state.invokes.empty)
 	#foreach($data in $state.getDatamodel().getData())
 		#if($data.getId() == "invoke")
+			#set($mappings = false)
 			#if($state.invokes[0].type == "ROS_SERVICE")
-				#set($service_content = $data.getParsedValue().getValue().getChildNodes())
+				#if($data.getParsedValue().getType() == "NODE_LIST")
+					#foreach($data_value in $data.getParsedValue().getValue())
+						#if($data_value.getNodeName() == "rosservice")
+							#set($service_content = $data_value.getChildNodes())
+						#elseif($data_value.getNodeName() == "mappings")
+							#set($mappings = $data_value.getChildNodes())
+						#end
+					#end
+				#elseif($data.getParsedValue().getType() == "NODE")
+					#set($service_content = $data.getParsedValue().getValue().getChildNodes())
+				#end
 				#set($request_tag = $service_content.getElementsByTagName("request").item(0))
 				#set($response_tag = $service_content.getElementsByTagName("response").item(0))
 				#if($request_tag.getAttributes().item(0).getNodeValue() == "callback")
@@ -156,7 +167,17 @@ ${indent}#  ===================================== ${state.id} END ==============
 					#parse("template/ros/atomic/ROS_service_resp_cb.vm")
 				#end
 			#elseif($state.invokes[0].type == "ROS_ACTION")
-				#set($action_content = $data.getParsedValue().getValue().getChildNodes())
+				#if($data.getParsedValue().getType() == "NODE_LIST")
+					#foreach($data_value in $data.getParsedValue().getValue())
+						#if($data_value.getNodeName() == "rosaction")
+							#set($action_content = $data_value.getChildNodes())
+						#elseif($data_value.getNodeName() == "mappings")
+							#set($mappings = $data_value.getChildNodes())
+						#end
+					#end
+				#elseif($data.getParsedValue().getType() == "NODE")
+					#set($action_content = $data.getParsedValue().getValue().getChildNodes())
+				#end
 				#set($goal_tag = $action_content.getElementsByTagName("goal").item(0))
 				#set($result_tag = $action_content.getElementsByTagName("result").item(0))
 				#if($goal_tag.getAttributes().item(0).getNodeValue() == "callback")
@@ -185,7 +206,12 @@ ${indent}smach.StateMachine.add('${state.id}',
 	#else
 	${indent}# NOT_SUPPORTED
 	#end
-	${indent}transitions={#foreach($transition in $state.transitionsList)'$transition.event':'$transition.next'#if($foreach.hasNext), #end#end}
+	${indent}transitions={#foreach($transition in $state.transitionsList)'$transition.event':'$transition.next'#if($foreach.hasNext), #end#end}#if($mappings),#end
+	#if($mappings)
+	#set($map_list = $mappings.getElementsByTagName("map"))
+	#set($last = $map_list.getLength() - 1)
+	${indent}remapping={#foreach($i in [0..$last])'${map_list.item($i).getElementsByTagName("x").item(0).getFirstChild().getNodeValue()}':'${map_list.item($i).getElementsByTagName("y").item(0).getFirstChild().getNodeValue()}'#if($i != $last), #end#end}
+	#end
 ${indent})
 #end
 #*************************************************************************************************
@@ -218,8 +244,19 @@ ${indent})
 #if(!$state.invokes.empty)
 	#foreach($data in $state.getDatamodel().getData())
 		#if($data.getId() == "invoke")
+			#set($mappings = false)
 			#if($state.invokes[0].type == "ROS_SERVICE")
-				#set($service_content = $data.getParsedValue().getValue().getChildNodes())
+				#if($data.getParsedValue().getType() == "NODE_LIST")
+					#foreach($data_value in $data.getParsedValue().getValue())
+						#if($data_value.getNodeName() == "rosservice")
+							#set($service_content = $data_value.getChildNodes())
+						#elseif($data_value.getNodeName() == "mappings")
+							#set($mappings = $data_value.getChildNodes())
+						#end
+					#end
+				#elseif($data.getParsedValue().getType() == "NODE")
+					#set($service_content = $data.getParsedValue().getValue().getChildNodes())
+				#end
 				#set($request_tag = $service_content.getElementsByTagName("request").item(0))
 				#set($response_tag = $service_content.getElementsByTagName("response").item(0))
 				#if($request_tag.getAttributes().item(0).getNodeValue() == "callback")
@@ -229,7 +266,17 @@ ${indent})
 					#parse("template/ros/atomic/ROS_service_resp_cb.vm")
 				#end
 			#elseif($state.invokes[0].type == "ROS_ACTION")
-				#set($action_content = $data.getParsedValue().getValue().getChildNodes())
+				#if($data.getParsedValue().getType() == "NODE_LIST")
+					#foreach($data_value in $data.getParsedValue().getValue())
+						#if($data_value.getNodeName() == "rosaction")
+							#set($action_content = $data_value.getChildNodes())
+						#elseif($data_value.getNodeName() == "mappings")
+							#set($mappings = $data_value.getChildNodes())
+						#end
+					#end
+				#elseif($data.getParsedValue().getType() == "NODE")
+					#set($action_content = $data.getParsedValue().getValue().getChildNodes())
+				#end
 				#set($goal_tag = $action_content.getElementsByTagName("goal").item(0))
 				#set($result_tag = $action_content.getElementsByTagName("result").item(0))
 				#if($goal_tag.getAttributes().item(0).getNodeValue() == "callback")
@@ -249,19 +296,24 @@ ${indent}# ADD ${state.id} to#if(${state.getParent()}) ${state.getParent().id}#e
 ${indent}smach.Concurrence.add('${state.id}',
 	#if(!$state.invokes.empty)
 		#if($state.invokes[0].type == "ROS_SERVICE")
-			#set($continue=false)
+			#set($continue = $mappings)
 			#parse("template/ros/atomic/ROS_service_state.vm")
 		#elseif($state.invokes[0].type == "ROS_ACTION")
-			#set($continue=false)
+			#set($continue = $mappings)
 			#parse("template/ros/atomic/ROS_action_state.vm")
 		#elseif($state.invokes[0].type == "ROS_MONITOR")
-			#set($continue=false)
+			#set($continue = false)
 			#parse("template/ros/atomic/ROS_monitor_state.vm")
 		#else
 	${indent}# NOT_SUPPORTED
 		#end
 	#else
 	${indent}# NOT_SUPPORTED
+	#end
+	#if($mappings)
+	#set($map_list = $mappings.getElementsByTagName("map"))
+	#set($last = $map_list.getLength() - 1)
+	${indent}remapping={#foreach($i in [0..$last])'${map_list.item($i).getElementsByTagName("x").item(0).getFirstChild().getNodeValue()}':'${map_list.item($i).getElementsByTagName("y").item(0).getFirstChild().getNodeValue()}'#if($i != $last), #end#end}
 	#end
 ${indent})
 #end

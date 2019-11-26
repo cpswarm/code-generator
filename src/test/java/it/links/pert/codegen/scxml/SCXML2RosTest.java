@@ -20,7 +20,7 @@ class SCXML2RosTest {
 
 	private static final String OUTPUT_DIR = "test_tmp/";
 	private static File testDirectory;
-	private static boolean DEBUG = true;
+	private static boolean DEBUG = false;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SCXML2RosTest.class.getName());
 
