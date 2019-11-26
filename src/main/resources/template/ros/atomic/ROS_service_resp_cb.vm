@@ -1,0 +1,9 @@
+#set($srv_fullname = $service_content.getElementsByTagName("srv").item(0).getFirstChild().getNodeValue())
+#set($start = $srv_fullname.indexOf('/') + 1)
+#set($end = $srv_fullname.length())
+#set($srv_class = $srv_fullname.substring($start, $end))
+${indent}# Response callback
+${indent}def ${srv_class.toLowerCase()}_response_cb(userdata, response):
+${indent}	# To be completed
+${indent}	return ''
+

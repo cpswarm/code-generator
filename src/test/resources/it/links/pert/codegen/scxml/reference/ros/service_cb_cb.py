@@ -81,6 +81,16 @@ def main():
 				transitions={'missionStart':'TakeOff'}
 			)
 
+			# Request callback
+			def takeoff_request_cb(userdata, request):
+				# To be completed
+				return request
+
+			# Response callback
+			def takeoff_response_cb(userdata, response):
+				# To be completed
+				return ''
+
 			# ADD TakeOff to SarBehavior #
 			smach.StateMachine.add('TakeOff',
 				smach_ros.ServiceState('cmd/takeoff',

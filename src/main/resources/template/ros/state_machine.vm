@@ -142,25 +142,41 @@ ${indent}#  ===================================== ${state.id} END ==============
 *###
 #macro(addAtomicToState $state $indent)
 
+#if(!$state.invokes.empty)
+	#foreach($data in $state.getDatamodel().getData())
+		#if($data.getId() == "invoke")
+			#if($state.invokes[0].type == "ROS_SERVICE")
+				#set($service_content = $data.getParsedValue().getValue().getChildNodes())
+				#set($request_tag = $service_content.getElementsByTagName("request").item(0))
+				#set($response_tag = $service_content.getElementsByTagName("response").item(0))
+				#if($request_tag.getAttributes().item(0).getNodeValue() == "callback")
+					#parse("template/ros/atomic/ROS_service_req_cb.vm")
+				#end
+				#if($response_tag.getAttributes().item(0).getNodeValue() == "callback")
+					#parse("template/ros/atomic/ROS_service_resp_cb.vm")
+				#end
+			#elseif($state.invokes[0].type == "ROS_ACTION")
+				#set($action_content = $data.getParsedValue().getValue().getChildNodes())
+				#set($goal_tag = $action_content.getElementsByTagName("goal").item(0))
+				#set($result_tag = $action_content.getElementsByTagName("result").item(0))
+				#if($goal_tag.getAttributes().item(0).getNodeValue() == "callback")
+					#parse("template/ros/atomic/ROS_action_goal_cb.vm")
+				#end
+				#if($result_tag.getAttributes().item(0).getNodeValue() == "callback")
+					#parse("template/ros/atomic/ROS_action_result_cb.vm")
+				#end
+			#end
+			#break
+		#end
+	#end
+#end
 ${indent}# ADD ${state.id} to#if(${state.getParent()}) ${state.getParent().id}#else TOP state#end #
 ${indent}smach.StateMachine.add('${state.id}',
 	#if(!$state.invokes.empty)
 		#if($state.invokes[0].type == "ROS_SERVICE")
-			#foreach($data in $state.getDatamodel().getData())
-				#if($data.getId() == "invoke")
-					#set($service_content = $data.getParsedValue().getValue().getChildNodes())
-					#break
-				#end
-			#end
 			#set($continue=true)
 			#parse("template/ros/atomic/ROS_service_state.vm")
 		#elseif($state.invokes[0].type == "ROS_ACTION")
-			#foreach($data in $state.getDatamodel().getData())
-				#if($data.getId() == "invoke")
-					#set($action_content = $data.getParsedValue().getValue().getChildNodes())
-					#break
-				#end
-			#end
 			#set($continue=true)
 			#parse("template/ros/atomic/ROS_action_state.vm")
 		#else
@@ -199,34 +215,46 @@ ${indent})
 *###
 #macro(addAtomicToConcurrence $state $indent)
 
+#if(!$state.invokes.empty)
+	#foreach($data in $state.getDatamodel().getData())
+		#if($data.getId() == "invoke")
+			#if($state.invokes[0].type == "ROS_SERVICE")
+				#set($service_content = $data.getParsedValue().getValue().getChildNodes())
+				#set($request_tag = $service_content.getElementsByTagName("request").item(0))
+				#set($response_tag = $service_content.getElementsByTagName("response").item(0))
+				#if($request_tag.getAttributes().item(0).getNodeValue() == "callback")
+					#parse("template/ros/atomic/ROS_service_req_cb.vm")
+				#end
+				#if($response_tag.getAttributes().item(0).getNodeValue() == "callback")
+					#parse("template/ros/atomic/ROS_service_resp_cb.vm")
+				#end
+			#elseif($state.invokes[0].type == "ROS_ACTION")
+				#set($action_content = $data.getParsedValue().getValue().getChildNodes())
+				#set($goal_tag = $action_content.getElementsByTagName("goal").item(0))
+				#set($result_tag = $action_content.getElementsByTagName("result").item(0))
+				#if($goal_tag.getAttributes().item(0).getNodeValue() == "callback")
+					#parse("template/ros/atomic/ROS_action_goal_cb.vm")
+				#end
+				#if($result_tag.getAttributes().item(0).getNodeValue() == "callback")
+					#parse("template/ros/atomic/ROS_action_result_cb.vm")
+				#end
+			#elseif($state.invokes[0].type == "ROS_MONITOR")
+				#set($monitor_content = $data.getParsedValue().getValue().getChildNodes())
+			#end
+			#break
+		#end
+	#end
+#end
 ${indent}# ADD ${state.id} to#if(${state.getParent()}) ${state.getParent().id}#else TOP state#end #
 ${indent}smach.Concurrence.add('${state.id}',
 	#if(!$state.invokes.empty)
 		#if($state.invokes[0].type == "ROS_SERVICE")
-			#foreach($data in $state.getDatamodel().getData())
-				#if($data.getId() == "invoke")
-					#set($service_content = $data.getParsedValue().getValue().getChildNodes())
-					#break
-				#end
-			#end
 			#set($continue=false)
 			#parse("template/ros/atomic/ROS_service_state.vm")
 		#elseif($state.invokes[0].type == "ROS_ACTION")
-			#foreach($data in $state.getDatamodel().getData())
-				#if($data.getId() == "invoke")
-					#set($action_content = $data.getParsedValue().getValue().getChildNodes())
-					#break
-				#end
-			#end
 			#set($continue=false)
 			#parse("template/ros/atomic/ROS_action_state.vm")
 		#elseif($state.invokes[0].type == "ROS_MONITOR")
-			#foreach($data in $state.getDatamodel().getData())
-				#if($data.getId() == "invoke")
-					#set($monitor_content = $data.getParsedValue().getValue().getChildNodes())
-					#break
-				#end
-			#end
 			#set($continue=false)
 			#parse("template/ros/atomic/ROS_monitor_state.vm")
 		#else

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml initial="SarBehavior" name="sar" version="1.0"
+	xmlns="http://www.w3.org/2005/07/scxml"
+	xmlns:cpswarm="http://my.custom-actions.domain/cpswarm/CUSTOM">
+	<!-- ******************** SAR BEHAVIOR ******************** -->
+	<state id="SarBehavior">
+		<!-- ******************** IDLE THREADS ******************** -->
+		<parallel id="IdleThreads">
+			<state id="Idle" />
+			<state id="IdleEventMonitoring">
+				<datamodel>
+					<data id="invoke">
+						<rosmonitor>
+							<topic>bridge/events/mission_start</topic>
+							<msg>swarmros/SimpleEvent</msg>
+						</rosmonitor>
+					</data>
+				</datamodel>
+				<invoke type="ROS_MONITOR" />
+			</state>
+			<transition event="missionStart" target="TakeOff" />
+		</parallel>
+		<!-- **************** TAKEOFF ******************** -->
+		<state id="TakeOff">
+			<datamodel>
+				<data id="adf">
+					<name>uav_mavros_takeoff</name>
+				</data>
+				<data id="invoke">
+					<rosaction>
+						<name>cmd/takeoff</name>
+						<action>uav_mavros_takeoff/TakeOff</action>
+						<goal type="callback" />
+						<result type="callback" />
+					</rosaction>
+				</data>
+			</datamodel>
+			<invoke type="ROS_ACTION" />
+			<transition event="succeeded" target="IdleThreads" />
+		</state>
+	</state>
+</scxml>

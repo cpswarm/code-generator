@@ -1,0 +1,9 @@
+#set($srv_fullname = $action_content.getElementsByTagName("action").item(0).getFirstChild().getNodeValue())
+#set($start = $srv_fullname.indexOf('/') + 1)
+#set($end = $srv_fullname.length())
+#set($srv_class = $srv_fullname.substring($start, $end))
+${indent}# Goal callback
+${indent}def ${srv_class.toLowerCase()}_goal_cb(userdata, status, result):
+${indent}	# To be completed
+${indent}	return ''
+
