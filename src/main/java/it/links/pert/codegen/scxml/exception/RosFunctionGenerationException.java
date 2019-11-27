@@ -1,4 +1,4 @@
-package it.links.pert.codegen.scxml;
+package it.links.pert.codegen.scxml.exception;
 
 public class RosFunctionGenerationException extends Exception {
 

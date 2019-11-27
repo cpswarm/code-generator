@@ -30,6 +30,8 @@ import it.links.pert.codegen.generator.CodeGenerator;
 import it.links.pert.codegen.json.RosADFReader;
 import it.links.pert.codegen.model.ros.RosADF;
 import it.links.pert.codegen.model.ros.RosFunction;
+import it.links.pert.codegen.scxml.exception.RosFunctionGenerationException;
+import it.links.pert.codegen.scxml.helper.SCXMLExtractor;
 
 public class SCXML2RosGenerator implements CodeGenerator {
 
@@ -81,8 +83,8 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		engine.setProperty("parser.space_gobbling", "lines");
 	}
 
-	public void setInitialRosPkgName(final String initialRosPkgName) {
-		this.initialRosPkgName = initialRosPkgName;
+	protected String getOutputDir() {
+		return outputDir;
 	}
 
 	/**

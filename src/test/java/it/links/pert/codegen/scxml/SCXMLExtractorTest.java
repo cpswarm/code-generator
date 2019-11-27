@@ -16,6 +16,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import it.links.pert.codegen.scxml.helper.SCXMLExtractor;
+
 class SCXMLExtractorTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SCXMLExtractorTest.class.getName());

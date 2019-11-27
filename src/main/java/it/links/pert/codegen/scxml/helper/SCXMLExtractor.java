@@ -1,4 +1,4 @@
-package it.links.pert.codegen.scxml;
+package it.links.pert.codegen.scxml.helper;
 
 import java.io.IOException;
 import java.io.InputStream;
