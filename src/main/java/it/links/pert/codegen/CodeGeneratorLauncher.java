@@ -1,74 +1,61 @@
 package it.links.pert.codegen;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import it.links.pert.codegen.generator.CodeGenerator;
-import it.links.pert.codegen.scxml.SCXML2RosGenerator;
+import it.links.pert.codegen.generator.CodeGeneratorFactory;
+import it.links.pert.codegen.generator.CodeGeneratorType;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
-public final class CodeGeneratorLauncher {
+@Command(mixinStandardHelpOptions = true, sortOptions = false, version="1.0")
+public final class CodeGeneratorLauncher implements Callable<Boolean> {
+
+	@Option(names = { "--env", "-e" }, description = "Target runtime environment (default: ${DEFAULT-VALUE})", defaultValue = "ROS")
+	String runtimeEnv;
+	@Option(names = { "--output", "-o" }, required = true, description = "Output directory path")
+	String outputDir;
+	@Option(names = { "--scxml" }, required = true, description = "SCXML behavior file path", paramLabel = "<filePath>")
+	String scxmlPath;
+	@Option(names = { "--adf" }, required = true, description = "Abstraction Description File (ADF) path", paramLabel = "<filePath>")
+	String adfPath;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeGeneratorLauncher.class.getName());
 
-	/*
-	 * Private constructor
-	 */
-	private CodeGeneratorLauncher() {
+	public static void main(String[] args) {
+		System.exit(new CommandLine(new CodeGeneratorLauncher()).execute(args));
 	}
 
-	public static void main(String[] args) {
+	@Override
+	public Boolean call() throws Exception {
+		boolean success = false;
 
-		String scxmlPath = null;
-		String outputDir = null;
-		String runtimeEnv = null;
-		String adfPath = null;
-
-		int i = 0;
-		String arg;
-
-		while (i < args.length && args[i].startsWith("--")) {
-			arg = args[i++];
-			if ("--scxml".equals(arg)) {
-				if (i < args.length) {
-					scxmlPath = args[i++];
-				} else {
-					LOGGER.error("--scxml requires a valid file path");
-				}
-			} else if ("--adf".equals(arg)) {
-				if (i < args.length) {
-					adfPath = args[i++];
-				} else {
-					LOGGER.error("--adf requires a valid file path");
-				}
-			} else if ("--output".equals(arg)) {
-				if (i < args.length) {
-					outputDir = args[i++];
-				} else {
-					LOGGER.error("--output requires an existing directory path");
-				}
-			} else if ("--env".equals(arg)) {
-				if (i < args.length) {
-					runtimeEnv = args[i++];
-				} else {
-					LOGGER.error("--env requires a valid Runtime Environment (e.g. ROS)");
-				}
-			}
-		}
+		Map<String, String> options = new HashMap<String, String>();
+		options.put("scxmlPath", scxmlPath);
+		options.put("adfPath", adfPath);
 
 		CodeGenerator generator = null;
 		switch (runtimeEnv) {
 		case "ROS":
-			generator = new SCXML2RosGenerator(scxmlPath, adfPath, outputDir);
+			generator = CodeGeneratorFactory.getInstance(CodeGeneratorType.SCXML2ROS, outputDir, options);
 			break;
 		default:
-			generator = new SCXML2RosGenerator(scxmlPath, adfPath, outputDir);
+			generator = CodeGeneratorFactory.getInstance(CodeGeneratorType.SCXML2ROS, outputDir, options);
 		}
 
-		if (generator.generate()) {
+		success = generator.generate();
+		if (success) {
 			LOGGER.info("Code generated with SUCCESS!!");
 		} else {
 			LOGGER.info("An error occured during code generation");
 		}
+		return success;
 	}
 
 }

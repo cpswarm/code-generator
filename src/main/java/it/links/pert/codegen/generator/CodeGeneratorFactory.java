@@ -6,7 +6,7 @@ import it.links.pert.codegen.scxml.SCXML2RosGenerator;
 
 public class CodeGeneratorFactory {
 
-	public static CodeGenerator getCodeGeneratorInstance(CodeGeneratorType type, String outputDir,
+	public static CodeGenerator getInstance(CodeGeneratorType type, String outputDir,
 			Map<String, String> options) {
 		CodeGenerator generator = null;
 
