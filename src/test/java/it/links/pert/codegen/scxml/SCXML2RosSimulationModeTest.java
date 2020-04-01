@@ -1,6 +1,7 @@
 package it.links.pert.codegen.scxml;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +49,13 @@ class SCXML2RosSimulationModeTest {
 		return new SCXML2RosSimulationMode(generator);
 	}
 
+	private SCXML2RosSimulationMode getGenerator(final String scxmlName, final String adfName) {
+		SCXML2RosGenerator generator = new SCXML2RosGenerator.SCXML2RosGeneratorBuilder(
+				SCXML2RosSimulationModeTest.class.getResource(scxmlName).getFile(), OUTPUT_DIR)
+						.adfPath(SCXML2RosSimulationModeTest.class.getResource(adfName).getFile()).build();
+		return new SCXML2RosSimulationMode(generator);
+	}
+
 	@Test
 	public void testCreateROSPackage() {
 		LOGGER.info("-----------------------------------------------------------------------------------------");
@@ -56,6 +64,22 @@ class SCXML2RosSimulationModeTest {
 		final SCXML2RosSimulationMode generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json",
 				"createROSpkg");
 		assertTrue(generator.createNewROSPackage());
+	}
+	
+	@Test
+	public void testCreateROSPackageWithExistingDir() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testCreateROSPackageWithExistingDir test--------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final SCXML2RosSimulationMode generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json",
+				"existing_pkg");
+		assertTrue(generator.createNewROSPackage());
+		final File beahaviorPkg = new File(OUTPUT_DIR + (generator.generator.getLastGeneratedPkgName()));
+		if (beahaviorPkg.exists())
+			assertTrue(generator.createNewROSPackage());
+		else {
+			fail("Default package should already exist");
+		}
 	}
 
 	@Test
@@ -66,6 +90,27 @@ class SCXML2RosSimulationModeTest {
 		final SCXML2RosSimulationMode generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json",
 				"test_generate");
 		assertTrue(generator.generate());
+	}
+
+	@Test
+	public void testMultipleGenerations1() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testMultipleGenerations1 test--------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final SCXML2RosSimulationMode generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json");
+		assertTrue(generator.generate());
+		assertTrue(generator.generate());
+	}
+
+	@Test
+	public void testMultipleGenerations2() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testMultipleGenerations2 test--------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final SCXML2RosSimulationMode generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json");
+		assertTrue(generator.generate());
+		final SCXML2RosSimulationMode generator2 = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json");
+		assertTrue(generator2.generate());
 	}
 
 }

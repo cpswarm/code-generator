@@ -11,7 +11,7 @@ public class SCXML2RosSimulationMode extends SCXML2RosGenerationMode {
 	@Override
 	public boolean generate() {
 		boolean success = false;
-		success = createNewROSPackage() && super.generator.generateFSMBehavior();
+		success = createNewROSPackage() && generator.generateFSMBehavior();
 		return success;
 	}
 
@@ -21,8 +21,9 @@ public class SCXML2RosSimulationMode extends SCXML2RosGenerationMode {
 	 * @return true if the package is correctly created
 	 */
 	protected boolean createNewROSPackage() {
+		final boolean success = generator.createNewROSPackage();
 		final String worldPath = generator.getOutputDir() + generator.getLastGeneratedPkgName() + "/world";
 		final File worldFile = new File(worldPath);
-		return super.generator.createNewROSPackage() && worldFile.mkdir();
+		return success && worldFile.mkdir();
 	}
 }

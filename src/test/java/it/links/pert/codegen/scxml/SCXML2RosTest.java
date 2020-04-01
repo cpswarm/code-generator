@@ -287,7 +287,7 @@ class SCXML2RosTest {
 		LOGGER.info("--------------------Starting validateCompleteGeneration test---------------------------------");
 		LOGGER.info("-----------------------------------------------------------------------------------------");
 		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json");
-		generator.generate();
+		assertTrue(generator.generate());
 
 		final String base_dir_path = OUTPUT_DIR + generator.getLastGeneratedPkgName();
 		// Test generated behaviour against reference file
@@ -326,5 +326,26 @@ class SCXML2RosTest {
 		} catch (IOException e) {
 			fail("package.xml files should be available");
 		}
+	}
+
+	@Test
+	public void testMultipleGenerations1() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testMultipleGenerations1 test--------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json");
+		assertTrue(generator.generate());
+		assertTrue(generator.generate());
+	}
+	
+	@Test
+	public void testMultipleGenerations2() {
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		LOGGER.info("--------------------Starting testMultipleGenerations2 test--------------------------------");
+		LOGGER.info("-----------------------------------------------------------------------------------------");
+		final SCXML2RosGenerator generator = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json");
+		assertTrue(generator.generate());
+		final SCXML2RosGenerator generator2 = getGenerator("data/UAV_sar_FSM2.xml", "data/uav_ADF_test.json");
+		assertTrue(generator2.generate());
 	}
 }

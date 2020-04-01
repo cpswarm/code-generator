@@ -94,10 +94,10 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		}
 		this.scxmlPath = builder.scxmlPath;
 
-		if (builder.outputDir.endsWith("/")) {
+		if (builder.outputDir.endsWith(File.separator)) {
 			this.outputDir = builder.outputDir;
 		} else {
-			this.outputDir = builder.outputDir + "/";
+			this.outputDir = builder.outputDir + File.separator;
 		}
 
 		this.initialRosPkgName = builder.initialRosPkgName;
