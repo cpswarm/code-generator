@@ -29,10 +29,14 @@ public final class CodeGeneratorFactory {
 			final SCXML2RosGeneratorBuilder builder = new SCXML2RosGenerator.SCXML2RosGeneratorBuilder(
 					options.get("scxmlPath"), outputDir);
 			if (options.containsKey("rosPkgName")) {
-				builder.initialRosPkgName(options.get("rosPkgName"));
+				final String rosPkgName = options.get("rosPkgName");
+				if (rosPkgName != null && !rosPkgName.isEmpty())
+					builder.initialRosPkgName(rosPkgName);
 			}
 			if (options.containsKey("adfPath")) {
-				builder.withADFPath(options.get("adfPath"));
+				final String adfPath = options.get("adfPath");
+				if (adfPath != null && !adfPath.isEmpty())
+					builder.withADFPath(adfPath);
 			}
 			generator = builder.build();
 			if (options.containsKey("mode")) {

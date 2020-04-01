@@ -70,6 +70,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			this.scxmlPath = scxmlPath;
 			this.outputDir = outputDir;
 			this.rosPkgName = ROS_PKG_DEAFULT_NAME;
+			this.adfPath = null;
 		}
 
 		public SCXML2RosGeneratorBuilder withADFPath(final String adfPath) {
@@ -207,8 +208,11 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	// ************************************************************************//
 
 	/**
-	 * Generate ROS functions skeleton Functions to be generated are extracted from
-	 * SCXML file Data to generate function code are extracted from ADF json file
+	 * Generate ROS functions skeleton
+	 * 
+	 * Functions to be generated are extracted from SCXML file
+	 * 
+	 * Data to generate function code are extracted from ADF json file
 	 * 
 	 * @return boolean Return true if generation process completed correctly
 	 */
