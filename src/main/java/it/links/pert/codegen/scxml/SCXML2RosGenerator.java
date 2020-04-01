@@ -44,39 +44,73 @@ public class SCXML2RosGenerator implements CodeGenerator {
 	protected final static String SMACH_FILE_NAME = "behaviour.py";
 	protected final static String ROS_PKG_DEAFULT_NAME = "fsm_behaviour";
 
-	private final VelocityEngine engine;
-	private final String scxmlPath;
-	private final String adfPath;
-	private final String outputDir;
-	// Initial name for new generated ROS packages
-	private String initialRosPkgName;
-	// Last generated package name (to allow multiple generation using the same
-	// SCXML2RosGenerator instance)
+	// *** INTERNAL VARS ***
+	/**
+	 * Last generated package name (to allow multiple generation using the same //
+	 * SCXML2RosGenerator instance)
+	 */
 	private String currentRosPkgName;
+	private final VelocityEngine engine;
 
-	public SCXML2RosGenerator(final String scxmlPath, final String adfPath, final String outputDir) {
-		this(scxmlPath, adfPath, outputDir, ROS_PKG_DEAFULT_NAME);
+	private final String scxmlPath; // required
+	private final String outputDir; // required
+	private final String adfPath; // optional
+	/**
+	 * Initial name for new generated ROS packages
+	 */
+	private final String initialRosPkgName; // optional
+
+	public static class SCXML2RosGeneratorBuilder {
+		private final String scxmlPath;
+		private final String outputDir;
+		private String adfPath;
+		private String initialRosPkgName;
+
+		public SCXML2RosGeneratorBuilder(String scxmlPath, String outputDir) {
+			this.scxmlPath = scxmlPath;
+			this.outputDir = outputDir;
+			this.initialRosPkgName = ROS_PKG_DEAFULT_NAME;
+		}
+
+		public SCXML2RosGeneratorBuilder adfPath(String adfPath) {
+			this.adfPath = adfPath;
+			return this;
+		}
+
+		public SCXML2RosGeneratorBuilder initialRosPkgName(String initialRosPkgName) {
+			this.initialRosPkgName = initialRosPkgName;
+			return this;
+		}
+
+		public SCXML2RosGenerator build() {
+			return new SCXML2RosGenerator(this);
+		}
 	}
 
-	public SCXML2RosGenerator(final String scxmlPath, final String adfPath, final String outputDir,
-			final String rosPkgName) {
-		final File scxmlFile = new File(scxmlPath);
+	public SCXML2RosGenerator(SCXML2RosGeneratorBuilder builder) {
+		final File scxmlFile = new File(builder.scxmlPath);
 		if (!scxmlFile.exists()) {
-			throw new IllegalArgumentException("scxml path must be an existing file");
+			throw new IllegalArgumentException("SCXML path must be an existing file");
 		}
-		final File adfFile = new File(adfPath);
-		if (!adfFile.exists()) {
-			throw new IllegalArgumentException("adf path must be an existing file");
-		}
-		this.scxmlPath = scxmlPath;
-		this.adfPath = adfPath;
-		if (outputDir.endsWith("/")) {
-			this.outputDir = outputDir;
+		this.scxmlPath = builder.scxmlPath;
+
+		if (builder.outputDir.endsWith("/")) {
+			this.outputDir = builder.outputDir;
 		} else {
-			this.outputDir = outputDir + "/";
+			this.outputDir = builder.outputDir + "/";
 		}
-		this.initialRosPkgName = rosPkgName;
-		this.currentRosPkgName = rosPkgName;
+
+		this.initialRosPkgName = builder.initialRosPkgName;
+		this.currentRosPkgName = builder.initialRosPkgName;
+
+		if (builder.adfPath != null) {
+			final File adfFile = new File(builder.adfPath);
+			if (!adfFile.exists()) {
+				throw new IllegalArgumentException("ADF path must be an existing file");
+			}
+		}
+		this.adfPath = builder.adfPath;
+
 		engine = new VelocityEngine();
 		engine.setProperty(RuntimeConstants.RESOURCE_LOADERS, "classpath");
 		engine.setProperty("resource.loader.classpath.class", ClasspathResourceLoader.class.getName());
