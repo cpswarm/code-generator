@@ -64,21 +64,21 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		private final String scxmlPath;
 		private final String outputDir;
 		private String adfPath;
-		private String initialRosPkgName;
+		private String rosPkgName;
 
-		public SCXML2RosGeneratorBuilder(String scxmlPath, String outputDir) {
+		public SCXML2RosGeneratorBuilder(final String scxmlPath, final String outputDir) {
 			this.scxmlPath = scxmlPath;
 			this.outputDir = outputDir;
-			this.initialRosPkgName = ROS_PKG_DEAFULT_NAME;
+			this.rosPkgName = ROS_PKG_DEAFULT_NAME;
 		}
 
-		public SCXML2RosGeneratorBuilder adfPath(String adfPath) {
+		public SCXML2RosGeneratorBuilder withADFPath(final String adfPath) {
 			this.adfPath = adfPath;
 			return this;
 		}
 
-		public SCXML2RosGeneratorBuilder initialRosPkgName(String initialRosPkgName) {
-			this.initialRosPkgName = initialRosPkgName;
+		public SCXML2RosGeneratorBuilder initialRosPkgName(final String initialRosPkgName) {
+			this.rosPkgName = initialRosPkgName;
 			return this;
 		}
 
@@ -87,7 +87,7 @@ public class SCXML2RosGenerator implements CodeGenerator {
 		}
 	}
 
-	public SCXML2RosGenerator(SCXML2RosGeneratorBuilder builder) {
+	public SCXML2RosGenerator(final SCXML2RosGeneratorBuilder builder) {
 		final File scxmlFile = new File(builder.scxmlPath);
 		if (!scxmlFile.exists()) {
 			throw new IllegalArgumentException("SCXML path must be an existing file");
@@ -100,8 +100,8 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			this.outputDir = builder.outputDir + File.separator;
 		}
 
-		this.initialRosPkgName = builder.initialRosPkgName;
-		this.currentRosPkgName = builder.initialRosPkgName;
+		this.initialRosPkgName = builder.rosPkgName;
+		this.currentRosPkgName = builder.rosPkgName;
 
 		if (builder.adfPath != null) {
 			final File adfFile = new File(builder.adfPath);
@@ -219,20 +219,20 @@ public class SCXML2RosGenerator implements CodeGenerator {
 			// Get function names from SCXML file
 			final List<String> functionNames = SCXMLExtractor.getFunctionsToBeGenerated(scxmlStream);
 			if (!functionNames.isEmpty()) {
-				RosADFReader adfReader = new RosADFReader();
+				final RosADFReader adfReader = new RosADFReader();
 				final RosADF adf = adfReader.read(new File(adfPath));
 				for (final String name : functionNames) {
 					// Extract function description from ADF
-					RosFunction fncDescription = adf.getFunctionByName(name);
-					if (fncDescription != null) {
+					final RosFunction fncDescription = adf.getFunctionByName(name);
+					if (fncDescription == null) {
+						throw new RosFunctionGenerationException(
+								"Function description not available for \'" + name + "\'");
+					} else {
 						// Generate function skeleton
 						if (!createROSActionSkeleton(fncDescription)) {
 							// If operation FAILS return immediately
 							throw new RosFunctionGenerationException("ROS function generation error");
 						}
-					} else {
-						throw new RosFunctionGenerationException(
-								"Function description not available for \'" + name + "\'");
 					}
 				}
 			}

@@ -46,13 +46,13 @@ class SCXML2RosTest {
 
 	private SCXML2RosGenerator getGenerator(final String scxmlName, final String adfName, final String pkgName) {
 		return new SCXML2RosGenerator.SCXML2RosGeneratorBuilder(SCXML2RosTest.class.getResource(scxmlName).getFile(),
-				OUTPUT_DIR).initialRosPkgName(pkgName).adfPath(SCXML2RosTest.class.getResource(adfName).getFile())
+				OUTPUT_DIR).initialRosPkgName(pkgName).withADFPath(SCXML2RosTest.class.getResource(adfName).getFile())
 						.build();
 	}
 
 	private SCXML2RosGenerator getGenerator(final String scxmlName, final String adfName) {
 		return new SCXML2RosGenerator.SCXML2RosGeneratorBuilder(SCXML2RosTest.class.getResource(scxmlName).getFile(),
-				OUTPUT_DIR).adfPath(SCXML2RosTest.class.getResource(adfName).getFile()).build();
+				OUTPUT_DIR).withADFPath(SCXML2RosTest.class.getResource(adfName).getFile()).build();
 	}
 
 	@Test

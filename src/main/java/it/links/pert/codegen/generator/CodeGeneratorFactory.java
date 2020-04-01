@@ -6,7 +6,10 @@ import it.links.pert.codegen.scxml.SCXML2RosGenerator;
 import it.links.pert.codegen.scxml.SCXML2RosGenerator.SCXML2RosGeneratorBuilder;
 import it.links.pert.codegen.scxml.SCXML2RosSimulationMode;
 
-public class CodeGeneratorFactory {
+public final class CodeGeneratorFactory {
+
+	private CodeGeneratorFactory() {
+	}
 
 	/**
 	 * Factory to instantiate {@link CodeGenerator}
@@ -17,22 +20,25 @@ public class CodeGeneratorFactory {
 	 * 
 	 * @return a {@link CodeGenerator} instance
 	 */
-	public static CodeGenerator getInstance(CodeGeneratorType type, String outputDir, Map<String, String> options) {
+	public static CodeGenerator getInstance(final CodeGeneratorType type, final String outputDir,
+			final Map<String, String> options) {
 		CodeGenerator generator = null;
 
 		switch (type) {
 		case SCXML2ROS:
-			SCXML2RosGeneratorBuilder builder = new SCXML2RosGenerator.SCXML2RosGeneratorBuilder(options.get("scxmlPath"), outputDir);
+			final SCXML2RosGeneratorBuilder builder = new SCXML2RosGenerator.SCXML2RosGeneratorBuilder(
+					options.get("scxmlPath"), outputDir);
 			if (options.containsKey("rosPkgName")) {
 				builder.initialRosPkgName(options.get("rosPkgName"));
 			}
-			if(options.containsKey("adfPath")) {
-				builder.adfPath(options.get("adfPath"));
+			if (options.containsKey("adfPath")) {
+				builder.withADFPath(options.get("adfPath"));
 			}
 			generator = builder.build();
 			if (options.containsKey("mode")) {
-				String mode = options.get("mode");
-				if (mode != null && "simulation".contentEquals(mode)) {
+				final String mode = options.get("mode");
+				String SIMULATION_MODE = "simulation";
+				if (mode != null && SIMULATION_MODE.contentEquals(mode)) {
 					generator = new SCXML2RosSimulationMode((SCXML2RosGenerator) generator);
 				}
 			}

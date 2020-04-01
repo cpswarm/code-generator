@@ -14,17 +14,17 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(mixinStandardHelpOptions = true, sortOptions = false, version="1.0")
+@Command(mixinStandardHelpOptions = true, sortOptions = false, version = "1.0")
 public final class CodeGeneratorLauncher implements Callable<Boolean> {
 
 	@Option(names = { "--env", "-e" }, description = "Target runtime environment (default: ${DEFAULT-VALUE})", defaultValue = "ROS")
-	String runtimeEnv;
+	public String runtimeEnv;
 	@Option(names = { "--output", "-o" }, required = true, description = "Output directory path")
-	String outputDir;
+	public String outputDir;
 	@Option(names = { "--scxml" }, required = true, description = "SCXML behavior file path", paramLabel = "<filePath>")
-	String scxmlPath;
-	@Option(names = { "--adf" }, required = true, description = "Abstraction Description File (ADF) path", paramLabel = "<filePath>")
-	String adfPath;
+	public String scxmlPath;
+	@Option(names = { "--adf" }, description = "Abstraction Description File (ADF) path", paramLabel = "<filePath>")
+	public String adfPath;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CodeGeneratorLauncher.class.getName());
 
@@ -36,7 +36,7 @@ public final class CodeGeneratorLauncher implements Callable<Boolean> {
 	public Boolean call() throws Exception {
 		boolean success = false;
 
-		Map<String, String> options = new HashMap<String, String>();
+		final Map<String, String> options = new HashMap<String, String>();
 		options.put("scxmlPath", scxmlPath);
 		options.put("adfPath", adfPath);
 

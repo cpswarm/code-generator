@@ -4,7 +4,7 @@ import java.io.File;
 
 public class SCXML2RosSimulationMode extends SCXML2RosGenerationMode {
 
-	public SCXML2RosSimulationMode(SCXML2RosGenerator generator) {
+	public SCXML2RosSimulationMode(final SCXML2RosGenerator generator) {
 		super(generator);
 	}
 
