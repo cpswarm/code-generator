@@ -3,6 +3,7 @@ package it.links.pert.codegen.generator;
 import java.util.Map;
 
 import it.links.pert.codegen.scxml.SCXML2RosGenerator;
+import it.links.pert.codegen.scxml.SCXML2RosGenerator.SCXML2RosGeneratorBuilder;
 import it.links.pert.codegen.scxml.SCXML2RosSimulationMode;
 
 public class CodeGeneratorFactory {
@@ -21,12 +22,14 @@ public class CodeGeneratorFactory {
 
 		switch (type) {
 		case SCXML2ROS:
+			SCXML2RosGeneratorBuilder builder = new SCXML2RosGenerator.SCXML2RosGeneratorBuilder(options.get("scxmlPath"), outputDir);
 			if (options.containsKey("rosPkgName")) {
-				generator = new SCXML2RosGenerator(options.get("scxmlPath"), options.get("adfPath"), outputDir,
-						options.get("rosPkgName"));
-			} else {
-				generator = new SCXML2RosGenerator(options.get("scxmlPath"), options.get("adfPath"), outputDir);
+				builder.initialRosPkgName(options.get("rosPkgName"));
 			}
+			if(options.containsKey("adfPath")) {
+				builder.adfPath(options.get("adfPath"));
+			}
+			generator = builder.build();
 			if (options.containsKey("mode")) {
 				String mode = options.get("mode");
 				if (mode != null && "simulation".contentEquals(mode)) {

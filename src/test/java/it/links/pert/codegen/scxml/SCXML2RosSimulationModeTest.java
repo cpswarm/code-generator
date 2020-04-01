@@ -41,9 +41,11 @@ class SCXML2RosSimulationModeTest {
 	}
 
 	private SCXML2RosSimulationMode getGenerator(final String scxmlName, final String adfName, final String pkgName) {
-		return new SCXML2RosSimulationMode(
-				new SCXML2RosGenerator(SCXML2RosSimulationModeTest.class.getResource(scxmlName).getFile(),
-						SCXML2RosSimulationModeTest.class.getResource(adfName).getFile(), OUTPUT_DIR, pkgName));
+		SCXML2RosGenerator generator = new SCXML2RosGenerator.SCXML2RosGeneratorBuilder(
+				SCXML2RosSimulationModeTest.class.getResource(scxmlName).getFile(), OUTPUT_DIR)
+						.initialRosPkgName(pkgName)
+						.adfPath(SCXML2RosSimulationModeTest.class.getResource(adfName).getFile()).build();
+		return new SCXML2RosSimulationMode(generator);
 	}
 
 	@Test
