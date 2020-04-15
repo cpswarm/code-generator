@@ -4,7 +4,7 @@ The first version of the Code Generator supports the generation of code starting
 This project is currently under active development and not ready for production.
 
 ## Getting Started
-* Documentation: [wiki]
+* Documentation: [wiki](https://github.com/cpswarm/code-generator/wiki)
 
 ## Deployment
 Packages are built continuously with [Bamboo](https://pipelines.linksmart.eu/browse/CPSW-CGB/latest).
